@@ -3,7 +3,7 @@ const PROTO_VERSION = 3
 #
 # BSD 3-Clause License
 #
-# Copyright (c) 2018, Oleg Malyavkin
+# Copyright (c) 2018 - 2020, Oleg Malyavkin
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@ const PROTO_VERSION = 3
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # DEBUG_TAB redefine this "  " if you need, example: const DEBUG_TAB = "\t"
-const DEBUG_TAB = "  "
+const DEBUG_TAB : String = "  "
 
 enum PB_ERR {
 	NO_ERRORS = 0,
@@ -133,56 +133,47 @@ enum PB_SERVICE_STATE {
 }
 
 class PBField:
-	func _init(a_name, a_type, a_rule, a_tag, packed, a_value = null):
+	func _init(a_name : String, a_type : int, a_rule : int, a_tag : int, packed : bool, a_value = null):
 		name = a_name
 		type = a_type
 		rule = a_rule
 		tag = a_tag
 		option_packed = packed
 		value = a_value
-	var name
-	var type
-	var rule
-	var tag
-	var option_packed
+	var name : String
+	var type : int
+	var rule : int
+	var tag : int
+	var option_packed : bool
 	var value
-	var option_default = false
-
-class PBLengthDelimitedField:
-	var type = null
-	var tag = null
-	var begin = null
-	var size = null
-
-class PBUnpackedField:
-	var offset
-	var field
+	var option_default : bool = false
 
 class PBTypeTag:
-	var type = null
-	var tag = null
-	var offset = null
+	var ok : bool = false
+	var type : int
+	var tag : int
+	var offset : int
 
 class PBServiceField:
-	var field
+	var field : PBField
 	var func_ref = null
-	var state = PB_SERVICE_STATE.UNFILLED
+	var state : int = PB_SERVICE_STATE.UNFILLED
 
 class PBPacker:
-	static func convert_signed(n):
+	static func convert_signed(n : int) -> int:
 		if n < -2147483648:
 			return (n << 1) ^ (n >> 63)
 		else:
 			return (n << 1) ^ (n >> 31)
 
-	static func deconvert_signed(n):
+	static func deconvert_signed(n : int) -> int:
 		if n & 0x01:
 			return ~(n >> 1)
 		else:
 			return (n >> 1)
 
-	static func pack_varint(value):
-		var varint = PoolByteArray()
+	static func pack_varint(value) -> PoolByteArray:
+		var varint : PoolByteArray = PoolByteArray()
 		if typeof(value) == TYPE_BOOL:
 			if value:
 				value = 1
@@ -200,14 +191,14 @@ class PBPacker:
 			varint.append(0x01)
 		return varint
 
-	static func pack_bytes(value, count, data_type):
-		var bytes = PoolByteArray()
+	static func pack_bytes(value, count : int, data_type : int) -> PoolByteArray:
+		var bytes : PoolByteArray = PoolByteArray()
 		if data_type == PB_DATA_TYPE.FLOAT:
-			var spb = StreamPeerBuffer.new()
+			var spb : StreamPeerBuffer = StreamPeerBuffer.new()
 			spb.put_float(value)
 			bytes = spb.get_data_array()
 		elif data_type == PB_DATA_TYPE.DOUBLE:
-			var spb = StreamPeerBuffer.new()
+			var spb : StreamPeerBuffer = StreamPeerBuffer.new()
 			spb.put_double(value)
 			bytes = spb.get_data_array()
 		else:
@@ -216,16 +207,16 @@ class PBPacker:
 				value >>= 8
 		return bytes
 
-	static func unpack_bytes(bytes, index, count, data_type):
+	static func unpack_bytes(bytes : PoolByteArray, index : int, count : int, data_type : int):
 		var value = 0
 		if data_type == PB_DATA_TYPE.FLOAT:
-			var spb = StreamPeerBuffer.new()
+			var spb : StreamPeerBuffer = StreamPeerBuffer.new()
 			for i in range(index, count + index):
 				spb.put_u8(bytes[i])
 			spb.seek(0)
 			value = spb.get_float()
 		elif data_type == PB_DATA_TYPE.DOUBLE:
-			var spb = StreamPeerBuffer.new()
+			var spb : StreamPeerBuffer = StreamPeerBuffer.new()
 			for i in range(index, count + index):
 				spb.put_u8(bytes[i])
 			spb.seek(0)
@@ -237,57 +228,43 @@ class PBPacker:
 					value <<= 8
 		return value
 
-	static func unpack_varint(varint_bytes):
-		var value = 0
+	static func unpack_varint(varint_bytes) -> int:
+		var value : int = 0
 		for i in range(varint_bytes.size() - 1, -1, -1):
 			value |= varint_bytes[i] & 0x7F
 			if i != 0:
 				value <<= 7
 		return value
 
-	static func pack_type_tag(type, tag):
+	static func pack_type_tag(type : int, tag : int) -> PoolByteArray:
 		return pack_varint((tag << 3) | type)
 
-	static func isolate_varint(bytes, index):
-		var result = PoolByteArray()
+	static func isolate_varint(bytes : PoolByteArray, index : int) -> PoolByteArray:
+		var result : PoolByteArray = PoolByteArray()
 		for i in range(index, bytes.size()):
 			result.append(bytes[i])
 			if !(bytes[i] & 0x80):
 				break
 		return result
 
-	static func unpack_type_tag(bytes, index):
-		var varint_bytes = isolate_varint(bytes, index)
-		var result = PBTypeTag.new()
+	static func unpack_type_tag(bytes : PoolByteArray, index : int) -> PBTypeTag:
+		var varint_bytes : PoolByteArray = isolate_varint(bytes, index)
+		var result : PBTypeTag = PBTypeTag.new()
 		if varint_bytes.size() != 0:
+			result.ok = true
 			result.offset = varint_bytes.size()
-			var unpacked = unpack_varint(varint_bytes)
+			var unpacked : int = unpack_varint(varint_bytes)
 			result.type = unpacked & 0x07
 			result.tag = unpacked >> 3
 		return result
 
-	static func pack_length_delimeted(type, tag, bytes):
-		var result = pack_type_tag(type, tag)
+	static func pack_length_delimeted(type : int, tag : int, bytes : PoolByteArray) -> PoolByteArray:
+		var result : PoolByteArray = pack_type_tag(type, tag)
 		result.append_array(pack_varint(bytes.size()))
 		result.append_array(bytes)
 		return result
 
-	static func unpack_length_delimiter(bytes, index):
-		var result = PBLengthDelimitedField.new()
-		var type_tag = unpack_type_tag(bytes, index)
-		var offset = type_tag.offset
-		if offset != null:
-			result.type = type_tag.type
-			result.tag = type_tag.tag
-			var size = isolate_varint(bytes, offset)
-			if size > 0:
-				offset += size
-				if bytes.size() >= size + offset:
-					result.begin = offset
-					result.size = size
-		return result
-
-	static func pb_type_from_data_type(data_type):
+	static func pb_type_from_data_type(data_type : int) -> int:
 		if data_type == PB_DATA_TYPE.INT32 || data_type == PB_DATA_TYPE.SINT32 || data_type == PB_DATA_TYPE.UINT32 || data_type == PB_DATA_TYPE.INT64 || data_type == PB_DATA_TYPE.SINT64 || data_type == PB_DATA_TYPE.UINT64 || data_type == PB_DATA_TYPE.BOOL || data_type == PB_DATA_TYPE.ENUM:
 			return PB_TYPE.VARINT
 		elif data_type == PB_DATA_TYPE.FIXED32 || data_type == PB_DATA_TYPE.SFIXED32 || data_type == PB_DATA_TYPE.FLOAT:
@@ -299,13 +276,13 @@ class PBPacker:
 		else:
 			return PB_TYPE.UNDEFINED
 
-	static func pack_field(field):
-		var type = pb_type_from_data_type(field.type)
-		var type_copy = type
+	static func pack_field(field : PBField) -> PoolByteArray:
+		var type : int = pb_type_from_data_type(field.type)
+		var type_copy : int = type
 		if field.rule == PB_RULE.REPEATED && field.option_packed:
 			type = PB_TYPE.LENGTHDEL
-		var head = pack_type_tag(type, field.tag)
-		var data = PoolByteArray()
+		var head : PoolByteArray = pack_type_tag(type, field.tag)
+		var data : PoolByteArray = PoolByteArray()
 		if type == PB_TYPE.VARINT:
 			var value
 			if field.rule == PB_RULE.REPEATED:
@@ -343,7 +320,7 @@ class PBPacker:
 			if field.rule == PB_RULE.REPEATED:
 				if type_copy == PB_TYPE.VARINT:
 					if field.type == PB_DATA_TYPE.SINT32 || field.type == PB_DATA_TYPE.SINT64:
-						var signed_value
+						var signed_value : int
 						for v in field.value:
 							signed_value = convert_signed(v)
 							data.append_array(pack_varint(signed_value))
@@ -370,21 +347,17 @@ class PBPacker:
 					return data
 				elif typeof(field.value[0]) == TYPE_OBJECT:
 					for v in field.value:
-						var obj = v.to_bytes()
+						var obj : PoolByteArray = v.to_bytes()
 						#if obj != null && obj.size() > 0:
 						#	data.append_array(pack_length_delimeted(type, field.tag, obj))
 						#else:
 						#	data = PoolByteArray()
 						#	return data
-						if obj != null:#
-							data.append_array(pack_length_delimeted(type, field.tag, obj))#
-						else:#
-							data = PoolByteArray()#
-							return data#
+						data.append_array(pack_length_delimeted(type, field.tag, obj))
 					return data
 			else:
 				if field.type == PB_DATA_TYPE.STRING:
-					var str_bytes = field.value.to_utf8()
+					var str_bytes : PoolByteArray = field.value.to_utf8()
 					if PROTO_VERSION == 2 || (PROTO_VERSION == 3 && str_bytes.size() > 0):
 						data.append_array(str_bytes)
 						return pack_length_delimeted(type, field.tag, data)
@@ -393,14 +366,13 @@ class PBPacker:
 						data.append_array(field.value)
 						return pack_length_delimeted(type, field.tag, data)
 				elif typeof(field.value) == TYPE_OBJECT:
-					var obj = field.value.to_bytes()
+					var obj : PoolByteArray = field.value.to_bytes()
 					#if obj != null && obj.size() > 0:
 					#	data.append_array(obj)
 					#	return pack_length_delimeted(type, field.tag, data)
-					if obj != null:#
-						if obj.size() > 0:#
-							data.append_array(obj)#
-						return pack_length_delimeted(type, field.tag, data)#
+					if obj.size() > 0:
+						data.append_array(obj)
+					return pack_length_delimeted(type, field.tag, data)
 				else:
 					pass
 		if data.size() > 0:
@@ -409,7 +381,7 @@ class PBPacker:
 		else:
 			return data
 
-	static func unpack_field(bytes, offset, field, type, message_func_ref):
+	static func unpack_field(bytes : PoolByteArray, offset : int, field : PBField, type : int, message_func_ref) -> int:
 		if field.rule == PB_RULE.REPEATED && type != PB_TYPE.LENGTHDEL && field.option_packed:
 			var count = isolate_varint(bytes, offset)
 			if count.size() > 0:
@@ -509,7 +481,7 @@ class PBPacker:
 							else:
 								return offset
 						elif field.type == PB_DATA_TYPE.STRING:
-							var str_bytes = PoolByteArray()
+							var str_bytes : PoolByteArray = PoolByteArray()
 							for i in range(offset, inner_size + offset):
 								str_bytes.append(bytes[i])
 							if field.rule == PB_RULE.REPEATED:
@@ -518,7 +490,7 @@ class PBPacker:
 								field.value = str_bytes.get_string_from_utf8()
 							return offset + inner_size
 						elif field.type == PB_DATA_TYPE.BYTES:
-							var val_bytes = PoolByteArray()
+							var val_bytes : PoolByteArray = PoolByteArray()
 							for i in range(offset, inner_size + offset):
 								val_bytes.append(bytes[i])
 							if field.rule == PB_RULE.REPEATED:
@@ -532,16 +504,16 @@ class PBPacker:
 					return PB_ERR.LENGTHDEL_SIZE_NOT_FOUND
 		return PB_ERR.UNDEFINED_STATE
 
-	static func unpack_message(data, bytes, offset, limit):
+	static func unpack_message(data, bytes : PoolByteArray, offset : int, limit : int) -> int:
 		while true:
-			var tt = unpack_type_tag(bytes, offset)
-			if tt.offset != null:
+			var tt : PBTypeTag = unpack_type_tag(bytes, offset)
+			if tt.ok:
 				offset += tt.offset
 				if data.has(tt.tag):
-					var service = data[tt.tag]
-					var type = pb_type_from_data_type(service.field.type)
+					var service : PBServiceField = data[tt.tag]
+					var type : int = pb_type_from_data_type(service.field.type)
 					if type == tt.type || (tt.type == PB_TYPE.LENGTHDEL && service.field.rule == PB_RULE.REPEATED && service.field.option_packed):
-						var res = unpack_field(bytes, offset, service.field, type, service.func_ref)
+						var res : int = unpack_field(bytes, offset, service.field, type, service.func_ref)
 						if res > 0:
 							service.state = PB_SERVICE_STATE.FILLED
 							offset = res
@@ -557,14 +529,14 @@ class PBPacker:
 				return offset
 		return PB_ERR.UNDEFINED_STATE
 
-	static func pack_message(data):
+	static func pack_message(data) -> PoolByteArray:
 		var DEFAULT_VALUES
 		if PROTO_VERSION == 2:
 			DEFAULT_VALUES = DEFAULT_VALUES_2
 		elif PROTO_VERSION == 3:
 			DEFAULT_VALUES = DEFAULT_VALUES_3
-		var result = PoolByteArray()
-		var keys = data.keys()
+		var result : PoolByteArray = PoolByteArray()
+		var keys : Array = data.keys()
 		keys.sort()
 		for i in keys:
 			if data[i].field.value != null:
@@ -575,11 +547,11 @@ class PBPacker:
 				result.append_array(pack_field(data[i].field))
 			elif data[i].field.rule == PB_RULE.REQUIRED:
 				print("Error: required field is not filled: Tag:", data[i].field.tag)
-				return null
+				return PoolByteArray()
 		return result
 
-	static func check_required(data):
-		var keys = data.keys()
+	static func check_required(data) -> bool:
+		var keys : Array = data.keys()
 		for i in keys:
 			if data[i].field.rule == PB_RULE.REQUIRED && data[i].state == PB_SERVICE_STATE.UNFILLED:
 				return false
@@ -591,15 +563,15 @@ class PBPacker:
 			result[kv.get_key()] = kv.get_value()
 		return result
 	
-	static func tabulate(text, nesting):
-		var tab = ""
+	static func tabulate(text : String, nesting : int) -> String:
+		var tab : String = ""
 		for i in range(nesting):
 			tab += DEBUG_TAB
 		return tab + text
 	
-	static func value_to_string(value, field, nesting):
-		var result = ""
-		var text
+	static func value_to_string(value, field : PBField, nesting : int) -> String:
+		var result : String = ""
+		var text : String
 		if field.type == PB_DATA_TYPE.MESSAGE:
 			result += "{"
 			nesting += 1
@@ -626,8 +598,8 @@ class PBPacker:
 			result += String(value)
 		return result
 	
-	static func field_to_string(field, nesting):
-		var result = tabulate(field.name + ": ", nesting)
+	static func field_to_string(field : PBField, nesting : int) -> String:
+		var result : String = tabulate(field.name + ": ", nesting)
 		if field.type == PB_DATA_TYPE.MAP:
 			if field.value.size() > 0:
 				result += "(\n"
@@ -663,14 +635,14 @@ class PBPacker:
 		result += ";\n"
 		return result
 		
-	static func message_to_string(data, nesting = 0):
+	static func message_to_string(data, nesting : int = 0) -> String:
 		var DEFAULT_VALUES
 		if PROTO_VERSION == 2:
 			DEFAULT_VALUES = DEFAULT_VALUES_2
 		elif PROTO_VERSION == 3:
 			DEFAULT_VALUES = DEFAULT_VALUES_3
-		var result = ""
-		var keys = data.keys()
+		var result : String = ""
+		var keys : Array = data.keys()
 		keys.sort()
 		for i in keys:
 			if data[i].field.value != null:
@@ -682,6 +654,7 @@ class PBPacker:
 			elif data[i].field.rule == PB_RULE.REQUIRED:
 				result += data[i].field.name + ": " + "error"
 		return result
+
 
 
 ############### USER DATA BEGIN ################
@@ -698,21 +671,21 @@ class FloatValue:
 		
 	var data = {}
 	
-	var _value
-	func get_value():
+	var _value: PBField
+	func get_value() -> float:
 		return _value.value
-	func clear_value():
+	func clear_value() -> void:
 		_value.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_value(value):
+	func set_value(value : float) -> void:
 		_value.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -738,21 +711,21 @@ class GUID:
 		
 	var data = {}
 	
-	var _guid
-	func get_guid():
+	var _guid: PBField
+	func get_guid() -> String:
 		return _guid.value
-	func clear_guid():
+	func clear_guid() -> void:
 		_guid.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
-	func set_guid(value):
+	func set_guid(value : String) -> void:
 		_guid.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -809,70 +782,70 @@ class PlayerDto:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _ship
-	func get_ship():
+	var _ship: PBField
+	func get_ship() -> int:
 		return _ship.value
-	func clear_ship():
+	func clear_ship() -> void:
 		_ship.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
-	func set_ship(value):
+	func set_ship(value : int) -> void:
 		_ship.value = value
 	
-	var _x
-	func get_x():
+	var _x: PBField
+	func get_x() -> float:
 		return _x.value
-	func clear_x():
+	func clear_x() -> void:
 		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_x(value):
+	func set_x(value : float) -> void:
 		_x.value = value
 	
-	var _y
-	func get_y():
+	var _y: PBField
+	func get_y() -> float:
 		return _y.value
-	func clear_y():
+	func clear_y() -> void:
 		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_y(value):
+	func set_y(value : float) -> void:
 		_y.value = value
 	
-	var _angle
-	func get_angle():
+	var _angle: PBField
+	func get_angle() -> float:
 		return _angle.value
-	func clear_angle():
+	func clear_angle() -> void:
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_angle(value):
+	func set_angle(value : float) -> void:
 		_angle.value = value
 	
-	var _spawned
-	func get_spawned():
+	var _spawned: PBField
+	func get_spawned() -> bool:
 		return _spawned.value
-	func clear_spawned():
+	func clear_spawned() -> void:
 		_spawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.BOOL]
-	func set_spawned(value):
+	func set_spawned(value : bool) -> void:
 		_spawned.value = value
 	
-	var _name
-	func get_name():
+	var _name: PBField
+	func get_name() -> String:
 		return _name.value
-	func clear_name():
+	func clear_name() -> void:
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
-	func set_name(value):
+	func set_name(value : String) -> void:
 		_name.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -905,31 +878,31 @@ class BoltExhaustedEventDto:
 		
 	var data = {}
 	
-	var _boltId
-	func get_boltId():
+	var _boltId: PBField
+	func get_boltId() -> GUID:
 		return _boltId.value
-	func clear_boltId():
+	func clear_boltId() -> void:
 		_boltId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_boltId():
+	func new_boltId() -> GUID:
 		_boltId.value = GUID.new()
 		return _boltId.value
 	
-	var _ownerPlayerId
-	func get_ownerPlayerId():
+	var _ownerPlayerId: PBField
+	func get_ownerPlayerId() -> GUID:
 		return _ownerPlayerId.value
-	func clear_ownerPlayerId():
+	func clear_ownerPlayerId() -> void:
 		_ownerPlayerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_ownerPlayerId():
+	func new_ownerPlayerId() -> GUID:
 		_ownerPlayerId.value = GUID.new()
 		return _ownerPlayerId.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -992,79 +965,79 @@ class BoltFiredEventDto:
 		
 	var data = {}
 	
-	var _boltId
-	func get_boltId():
+	var _boltId: PBField
+	func get_boltId() -> GUID:
 		return _boltId.value
-	func clear_boltId():
+	func clear_boltId() -> void:
 		_boltId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_boltId():
+	func new_boltId() -> GUID:
 		_boltId.value = GUID.new()
 		return _boltId.value
 	
-	var _ownerPlayerId
-	func get_ownerPlayerId():
+	var _ownerPlayerId: PBField
+	func get_ownerPlayerId() -> GUID:
 		return _ownerPlayerId.value
-	func clear_ownerPlayerId():
+	func clear_ownerPlayerId() -> void:
 		_ownerPlayerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_ownerPlayerId():
+	func new_ownerPlayerId() -> GUID:
 		_ownerPlayerId.value = GUID.new()
 		return _ownerPlayerId.value
 	
-	var _x
-	func get_x():
+	var _x: PBField
+	func get_x() -> float:
 		return _x.value
-	func clear_x():
+	func clear_x() -> void:
 		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_x(value):
+	func set_x(value : float) -> void:
 		_x.value = value
 	
-	var _y
-	func get_y():
+	var _y: PBField
+	func get_y() -> float:
 		return _y.value
-	func clear_y():
+	func clear_y() -> void:
 		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_y(value):
+	func set_y(value : float) -> void:
 		_y.value = value
 	
-	var _angle
-	func get_angle():
+	var _angle: PBField
+	func get_angle() -> float:
 		return _angle.value
-	func clear_angle():
+	func clear_angle() -> void:
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_angle(value):
+	func set_angle(value : float) -> void:
 		_angle.value = value
 	
-	var _startTimestamp
-	func get_startTimestamp():
+	var _startTimestamp: PBField
+	func get_startTimestamp() -> int:
 		return _startTimestamp.value
-	func clear_startTimestamp():
+	func clear_startTimestamp() -> void:
 		_startTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
-	func set_startTimestamp(value):
+	func set_startTimestamp(value : int) -> void:
 		_startTimestamp.value = value
 	
-	var _speed
-	func get_speed():
+	var _speed: PBField
+	func get_speed() -> float:
 		return _speed.value
-	func clear_speed():
+	func clear_speed() -> void:
 		_speed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_speed(value):
+	func set_speed(value : float) -> void:
 		_speed.value = value
 	
-	var _ttl
-	func get_ttl():
+	var _ttl: PBField
+	func get_ttl() -> int:
 		return _ttl.value
-	func clear_ttl():
+	func clear_ttl() -> void:
 		_ttl.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
-	func set_ttl(value):
+	func set_ttl(value : int) -> void:
 		_ttl.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1102,39 +1075,39 @@ class PlayerDestroyedEventDto:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _destroyedByPlayerId
-	func get_destroyedByPlayerId():
+	var _destroyedByPlayerId: PBField
+	func get_destroyedByPlayerId() -> GUID:
 		return _destroyedByPlayerId.value
-	func clear_destroyedByPlayerId():
+	func clear_destroyedByPlayerId() -> void:
 		_destroyedByPlayerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_destroyedByPlayerId():
+	func new_destroyedByPlayerId() -> GUID:
 		_destroyedByPlayerId.value = GUID.new()
 		return _destroyedByPlayerId.value
 	
-	var _destroyedTimestamp
-	func get_destroyedTimestamp():
+	var _destroyedTimestamp: PBField
+	func get_destroyedTimestamp() -> int:
 		return _destroyedTimestamp.value
-	func clear_destroyedTimestamp():
+	func clear_destroyedTimestamp() -> void:
 		_destroyedTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
-	func set_destroyedTimestamp(value):
+	func set_destroyedTimestamp(value : int) -> void:
 		_destroyedTimestamp.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1171,38 +1144,38 @@ class PlayerJoinedEventDto:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _ship
-	func get_ship():
+	var _ship: PBField
+	func get_ship() -> int:
 		return _ship.value
-	func clear_ship():
+	func clear_ship() -> void:
 		_ship.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
-	func set_ship(value):
+	func set_ship(value : int) -> void:
 		_ship.value = value
 	
-	var _name
-	func get_name():
+	var _name: PBField
+	func get_name() -> String:
 		return _name.value
-	func clear_name():
+	func clear_name() -> void:
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
-	func set_name(value):
+	func set_name(value : String) -> void:
 		_name.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1229,22 +1202,22 @@ class PlayerLeftEventDto:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1301,70 +1274,70 @@ class PlayerMovedEventDto:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _x
-	func get_x():
+	var _x: PBField
+	func get_x() -> float:
 		return _x.value
-	func clear_x():
+	func clear_x() -> void:
 		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_x(value):
+	func set_x(value : float) -> void:
 		_x.value = value
 	
-	var _y
-	func get_y():
+	var _y: PBField
+	func get_y() -> float:
 		return _y.value
-	func clear_y():
+	func clear_y() -> void:
 		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_y(value):
+	func set_y(value : float) -> void:
 		_y.value = value
 	
-	var _angle
-	func get_angle():
+	var _angle: PBField
+	func get_angle() -> float:
 		return _angle.value
-	func clear_angle():
+	func clear_angle() -> void:
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_angle(value):
+	func set_angle(value : float) -> void:
 		_angle.value = value
 	
-	var _thrustAngle
-	func get_thrustAngle():
+	var _thrustAngle: PBField
+	func get_thrustAngle() -> float:
 		return _thrustAngle.value
-	func clear_thrustAngle():
+	func clear_thrustAngle() -> void:
 		_thrustAngle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_thrustAngle(value):
+	func set_thrustAngle(value : float) -> void:
 		_thrustAngle.value = value
 	
-	var _timestamp
-	func get_timestamp():
+	var _timestamp: PBField
+	func get_timestamp() -> int:
 		return _timestamp.value
-	func clear_timestamp():
+	func clear_timestamp() -> void:
 		_timestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
-	func set_timestamp(value):
+	func set_timestamp(value : int) -> void:
 		_timestamp.value = value
 	
-	var _velocity
-	func get_velocity():
+	var _velocity: PBField
+	func get_velocity() -> float:
 		return _velocity.value
-	func clear_velocity():
+	func clear_velocity() -> void:
 		_velocity.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_velocity(value):
+	func set_velocity(value : float) -> void:
 		_velocity.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1391,22 +1364,22 @@ class PlayerSpawnedEventDto:
 		
 	var data = {}
 	
-	var _location
-	func get_location():
+	var _location: PBField
+	func get_location() -> PlayerMovedEventDto:
 		return _location.value
-	func clear_location():
+	func clear_location() -> void:
 		_location.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_location():
+	func new_location() -> PlayerMovedEventDto:
 		_location.value = PlayerMovedEventDto.new()
 		return _location.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1443,38 +1416,38 @@ class PlayerScoreIncreasedEventDto:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _gained
-	func get_gained():
+	var _gained: PBField
+	func get_gained() -> int:
 		return _gained.value
-	func clear_gained():
+	func clear_gained() -> void:
 		_gained.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
-	func set_gained(value):
+	func set_gained(value : int) -> void:
 		_gained.value = value
 	
-	var _timestamp
-	func get_timestamp():
+	var _timestamp: PBField
+	func get_timestamp() -> int:
 		return _timestamp.value
-	func clear_timestamp():
+	func clear_timestamp() -> void:
 		_timestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
-	func set_timestamp(value):
+	func set_timestamp(value : int) -> void:
 		_timestamp.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1506,30 +1479,30 @@ class PlayerScoreUpdatedEventDto:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _score
-	func get_score():
+	var _score: PBField
+	func get_score() -> int:
 		return _score.value
-	func clear_score():
+	func clear_score() -> void:
 		_score.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
-	func set_score(value):
+	func set_score(value : int) -> void:
 		_score.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1561,30 +1534,30 @@ class ScoreEntry:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _score
-	func get_score():
+	var _score: PBField
+	func get_score() -> int:
 		return _score.value
-	func clear_score():
+	func clear_score() -> void:
 		_score.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
-	func set_score(value):
+	func set_score(value : int) -> void:
 		_score.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1611,23 +1584,23 @@ class ScoreBoardUpdatedEventDto:
 		
 	var data = {}
 	
-	var _scores
-	func get_scores():
+	var _scores: PBField
+	func get_scores() -> Array:
 		return _scores.value
-	func clear_scores():
+	func clear_scores() -> void:
 		_scores.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func add_scores():
+	func add_scores() -> ScoreEntry:
 		var element = ScoreEntry.new()
 		_scores.value.append(element)
 		return element
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -1714,16 +1687,16 @@ class Event:
 		
 	var data = {}
 	
-	var _boltExhausted
-	func has_boltExhausted():
+	var _boltExhausted: PBField
+	func has_boltExhausted() -> bool:
 		if data[1].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_boltExhausted():
+	func get_boltExhausted() -> BoltExhaustedEventDto:
 		return _boltExhausted.value
-	func clear_boltExhausted():
+	func clear_boltExhausted() -> void:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_boltExhausted():
+	func new_boltExhausted() -> BoltExhaustedEventDto:
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1737,16 +1710,16 @@ class Event:
 		_boltExhausted.value = BoltExhaustedEventDto.new()
 		return _boltExhausted.value
 	
-	var _boltFired
-	func has_boltFired():
+	var _boltFired: PBField
+	func has_boltFired() -> bool:
 		if data[2].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_boltFired():
+	func get_boltFired() -> BoltFiredEventDto:
 		return _boltFired.value
-	func clear_boltFired():
+	func clear_boltFired() -> void:
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_boltFired():
+	func new_boltFired() -> BoltFiredEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1760,16 +1733,16 @@ class Event:
 		_boltFired.value = BoltFiredEventDto.new()
 		return _boltFired.value
 	
-	var _playerFired
-	func has_playerFired():
+	var _playerFired: PBField
+	func has_playerFired() -> bool:
 		if data[3].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerFired():
+	func get_playerFired() -> BoltFiredEventDto:
 		return _playerFired.value
-	func clear_playerFired():
+	func clear_playerFired() -> void:
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerFired():
+	func new_playerFired() -> BoltFiredEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1783,16 +1756,16 @@ class Event:
 		_playerFired.value = BoltFiredEventDto.new()
 		return _playerFired.value
 	
-	var _playerDestroyed
-	func has_playerDestroyed():
+	var _playerDestroyed: PBField
+	func has_playerDestroyed() -> bool:
 		if data[4].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerDestroyed():
+	func get_playerDestroyed() -> PlayerDestroyedEventDto:
 		return _playerDestroyed.value
-	func clear_playerDestroyed():
+	func clear_playerDestroyed() -> void:
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerDestroyed():
+	func new_playerDestroyed() -> PlayerDestroyedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1806,16 +1779,16 @@ class Event:
 		_playerDestroyed.value = PlayerDestroyedEventDto.new()
 		return _playerDestroyed.value
 	
-	var _playerJoined
-	func has_playerJoined():
+	var _playerJoined: PBField
+	func has_playerJoined() -> bool:
 		if data[5].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerJoined():
+	func get_playerJoined() -> PlayerJoinedEventDto:
 		return _playerJoined.value
-	func clear_playerJoined():
+	func clear_playerJoined() -> void:
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerJoined():
+	func new_playerJoined() -> PlayerJoinedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1829,16 +1802,16 @@ class Event:
 		_playerJoined.value = PlayerJoinedEventDto.new()
 		return _playerJoined.value
 	
-	var _playerLeft
-	func has_playerLeft():
+	var _playerLeft: PBField
+	func has_playerLeft() -> bool:
 		if data[6].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerLeft():
+	func get_playerLeft() -> PlayerLeftEventDto:
 		return _playerLeft.value
-	func clear_playerLeft():
+	func clear_playerLeft() -> void:
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerLeft():
+	func new_playerLeft() -> PlayerLeftEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1852,16 +1825,16 @@ class Event:
 		_playerLeft.value = PlayerLeftEventDto.new()
 		return _playerLeft.value
 	
-	var _playerMoved
-	func has_playerMoved():
+	var _playerMoved: PBField
+	func has_playerMoved() -> bool:
 		if data[7].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerMoved():
+	func get_playerMoved() -> PlayerMovedEventDto:
 		return _playerMoved.value
-	func clear_playerMoved():
+	func clear_playerMoved() -> void:
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerMoved():
+	func new_playerMoved() -> PlayerMovedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1875,16 +1848,16 @@ class Event:
 		_playerMoved.value = PlayerMovedEventDto.new()
 		return _playerMoved.value
 	
-	var _playerSpawned
-	func has_playerSpawned():
+	var _playerSpawned: PBField
+	func has_playerSpawned() -> bool:
 		if data[8].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerSpawned():
+	func get_playerSpawned() -> PlayerSpawnedEventDto:
 		return _playerSpawned.value
-	func clear_playerSpawned():
+	func clear_playerSpawned() -> void:
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerSpawned():
+	func new_playerSpawned() -> PlayerSpawnedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1898,16 +1871,16 @@ class Event:
 		_playerSpawned.value = PlayerSpawnedEventDto.new()
 		return _playerSpawned.value
 	
-	var _playerScoreIncreased
-	func has_playerScoreIncreased():
+	var _playerScoreIncreased: PBField
+	func has_playerScoreIncreased() -> bool:
 		if data[9].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerScoreIncreased():
+	func get_playerScoreIncreased() -> PlayerScoreIncreasedEventDto:
 		return _playerScoreIncreased.value
-	func clear_playerScoreIncreased():
+	func clear_playerScoreIncreased() -> void:
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerScoreIncreased():
+	func new_playerScoreIncreased() -> PlayerScoreIncreasedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1921,16 +1894,16 @@ class Event:
 		_playerScoreIncreased.value = PlayerScoreIncreasedEventDto.new()
 		return _playerScoreIncreased.value
 	
-	var _playerScoreUpdated
-	func has_playerScoreUpdated():
+	var _playerScoreUpdated: PBField
+	func has_playerScoreUpdated() -> bool:
 		if data[10].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerScoreUpdated():
+	func get_playerScoreUpdated() -> PlayerScoreUpdatedEventDto:
 		return _playerScoreUpdated.value
-	func clear_playerScoreUpdated():
+	func clear_playerScoreUpdated() -> void:
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerScoreUpdated():
+	func new_playerScoreUpdated() -> PlayerScoreUpdatedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1944,16 +1917,16 @@ class Event:
 		_playerScoreUpdated.value = PlayerScoreUpdatedEventDto.new()
 		return _playerScoreUpdated.value
 	
-	var _scoreBoardUpdated
-	func has_scoreBoardUpdated():
+	var _scoreBoardUpdated: PBField
+	func has_scoreBoardUpdated() -> bool:
 		if data[11].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_scoreBoardUpdated():
+	func get_scoreBoardUpdated() -> ScoreBoardUpdatedEventDto:
 		return _scoreBoardUpdated.value
-	func clear_scoreBoardUpdated():
+	func clear_scoreBoardUpdated() -> void:
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_scoreBoardUpdated():
+	func new_scoreBoardUpdated() -> ScoreBoardUpdatedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -1967,13 +1940,13 @@ class Event:
 		_scoreBoardUpdated.value = ScoreBoardUpdatedEventDto.new()
 		return _scoreBoardUpdated.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2000,23 +1973,23 @@ class Events:
 		
 	var data = {}
 	
-	var _events
-	func get_events():
+	var _events: PBField
+	func get_events() -> Array:
 		return _events.value
-	func clear_events():
+	func clear_events() -> void:
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func add_events():
+	func add_events() -> Event:
 		var element = Event.new()
 		_events.value.append(element)
 		return element
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2053,38 +2026,38 @@ class MoveCommandDto:
 		
 	var data = {}
 	
-	var _moveX
-	func get_moveX():
+	var _moveX: PBField
+	func get_moveX() -> float:
 		return _moveX.value
-	func clear_moveX():
+	func clear_moveX() -> void:
 		_moveX.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_moveX(value):
+	func set_moveX(value : float) -> void:
 		_moveX.value = value
 	
-	var _moveY
-	func get_moveY():
+	var _moveY: PBField
+	func get_moveY() -> float:
 		return _moveY.value
-	func clear_moveY():
+	func clear_moveY() -> void:
 		_moveY.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
-	func set_moveY(value):
+	func set_moveY(value : float) -> void:
 		_moveY.value = value
 	
-	var _angle
-	func get_angle():
+	var _angle: PBField
+	func get_angle() -> FloatValue:
 		return _angle.value
-	func clear_angle():
+	func clear_angle() -> void:
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_angle():
+	func new_angle() -> FloatValue:
 		_angle.value = FloatValue.new()
 		return _angle.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2105,13 +2078,13 @@ class FireBoltCommandDto:
 		
 	var data = {}
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2132,13 +2105,13 @@ class SpawnCommandDto:
 		
 	var data = {}
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2164,21 +2137,21 @@ class JoinCommandDto:
 		
 	var data = {}
 	
-	var _name
-	func get_name():
+	var _name: PBField
+	func get_name() -> String:
 		return _name.value
-	func clear_name():
+	func clear_name() -> void:
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
-	func set_name(value):
+	func set_name(value : String) -> void:
 		_name.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2223,77 +2196,77 @@ class RequestCommand:
 		
 	var data = {}
 	
-	var _move
-	func has_move():
+	var _move: PBField
+	func has_move() -> bool:
 		if data[1].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_move():
+	func get_move() -> MoveCommandDto:
 		return _move.value
-	func clear_move():
+	func clear_move() -> void:
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_move():
+	func new_move() -> MoveCommandDto:
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_move.value = MoveCommandDto.new()
 		return _move.value
 	
-	var _fire
-	func has_fire():
+	var _fire: PBField
+	func has_fire() -> bool:
 		if data[2].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_fire():
+	func get_fire() -> FireBoltCommandDto:
 		return _fire.value
-	func clear_fire():
+	func clear_fire() -> void:
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_fire():
+	func new_fire() -> FireBoltCommandDto:
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_fire.value = FireBoltCommandDto.new()
 		return _fire.value
 	
-	var _spawn
-	func has_spawn():
+	var _spawn: PBField
+	func has_spawn() -> bool:
 		if data[3].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_spawn():
+	func get_spawn() -> SpawnCommandDto:
 		return _spawn.value
-	func clear_spawn():
+	func clear_spawn() -> void:
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_spawn():
+	func new_spawn() -> SpawnCommandDto:
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_spawn.value = SpawnCommandDto.new()
 		return _spawn.value
 	
-	var _join
-	func has_join():
+	var _join: PBField
+	func has_join() -> bool:
 		if data[4].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_join():
+	func get_join() -> JoinCommandDto:
 		return _join.value
-	func clear_join():
+	func clear_join() -> void:
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_join():
+	func new_join() -> JoinCommandDto:
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_join.value = JoinCommandDto.new()
 		return _join.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2320,23 +2293,23 @@ class PlayersListCommandDto:
 		
 	var data = {}
 	
-	var _players
-	func get_players():
+	var _players: PBField
+	func get_players() -> Array:
 		return _players.value
-	func clear_players():
+	func clear_players() -> void:
 		_players.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func add_players():
+	func add_players() -> PlayerDto:
 		var element = PlayerDto.new()
 		_players.value.append(element)
 		return element
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2362,21 +2335,21 @@ class PlayerScoreUpdateCommandDto:
 		
 	var data = {}
 	
-	var _score
-	func get_score():
+	var _score: PBField
+	func get_score() -> int:
 		return _score.value
-	func clear_score():
+	func clear_score() -> void:
 		_score.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
-	func set_score(value):
+	func set_score(value : int) -> void:
 		_score.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2403,23 +2376,23 @@ class LiveBoltListCommandDto:
 		
 	var data = {}
 	
-	var _bolts
-	func get_bolts():
+	var _bolts: PBField
+	func get_bolts() -> Array:
 		return _bolts.value
-	func clear_bolts():
+	func clear_bolts() -> void:
 		_bolts.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func add_bolts():
+	func add_bolts() -> BoltFiredEventDto:
 		var element = BoltFiredEventDto.new()
 		_bolts.value.append(element)
 		return element
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2464,67 +2437,67 @@ class DirectedCommand:
 		
 	var data = {}
 	
-	var _playerId
-	func get_playerId():
+	var _playerId: PBField
+	func get_playerId() -> GUID:
 		return _playerId.value
-	func clear_playerId():
+	func clear_playerId() -> void:
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerId():
+	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _playersList
-	func has_playersList():
+	var _playersList: PBField
+	func has_playersList() -> bool:
 		if data[2].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playersList():
+	func get_playersList() -> PlayersListCommandDto:
 		return _playersList.value
-	func clear_playersList():
+	func clear_playersList() -> void:
 		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playersList():
+	func new_playersList() -> PlayersListCommandDto:
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playersList.value = PlayersListCommandDto.new()
 		return _playersList.value
 	
-	var _playerScoreUpdate
-	func has_playerScoreUpdate():
+	var _playerScoreUpdate: PBField
+	func has_playerScoreUpdate() -> bool:
 		if data[3].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playerScoreUpdate():
+	func get_playerScoreUpdate() -> PlayerScoreUpdateCommandDto:
 		return _playerScoreUpdate.value
-	func clear_playerScoreUpdate():
+	func clear_playerScoreUpdate() -> void:
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playerScoreUpdate():
+	func new_playerScoreUpdate() -> PlayerScoreUpdateCommandDto:
 		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerScoreUpdate.value = PlayerScoreUpdateCommandDto.new()
 		return _playerScoreUpdate.value
 	
-	var _liveBoltsList
-	func has_liveBoltsList():
+	var _liveBoltsList: PBField
+	func has_liveBoltsList() -> bool:
 		if data[4].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_liveBoltsList():
+	func get_liveBoltsList() -> LiveBoltListCommandDto:
 		return _liveBoltsList.value
-	func clear_liveBoltsList():
+	func clear_liveBoltsList() -> void:
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_liveBoltsList():
+	func new_liveBoltsList() -> LiveBoltListCommandDto:
 		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = LiveBoltListCommandDto.new()
 		return _liveBoltsList.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2545,13 +2518,13 @@ class Flush:
 		
 	var data = {}
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2577,21 +2550,21 @@ class ClockSync:
 		
 	var data = {}
 	
-	var _time
-	func get_time():
+	var _time: PBField
+	func get_time() -> int:
 		return _time.value
-	func clear_time():
+	func clear_time() -> void:
 		_time.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
-	func set_time(value):
+	func set_time(value : int) -> void:
 		_time.value = value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
@@ -2642,16 +2615,16 @@ class Dto:
 		
 	var data = {}
 	
-	var _directedCommand
-	func has_directedCommand():
+	var _directedCommand: PBField
+	func has_directedCommand() -> bool:
 		if data[1].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_directedCommand():
+	func get_directedCommand() -> DirectedCommand:
 		return _directedCommand.value
-	func clear_directedCommand():
+	func clear_directedCommand() -> void:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_directedCommand():
+	func new_directedCommand() -> DirectedCommand:
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2659,16 +2632,16 @@ class Dto:
 		_directedCommand.value = DirectedCommand.new()
 		return _directedCommand.value
 	
-	var _event
-	func has_event():
+	var _event: PBField
+	func has_event() -> bool:
 		if data[2].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_event():
+	func get_event() -> Event:
 		return _event.value
-	func clear_event():
+	func clear_event() -> void:
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_event():
+	func new_event() -> Event:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2676,16 +2649,16 @@ class Dto:
 		_event.value = Event.new()
 		return _event.value
 	
-	var _events
-	func has_events():
+	var _events: PBField
+	func has_events() -> bool:
 		if data[3].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_events():
+	func get_events() -> Events:
 		return _events.value
-	func clear_events():
+	func clear_events() -> void:
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_events():
+	func new_events() -> Events:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2693,16 +2666,16 @@ class Dto:
 		_events.value = Events.new()
 		return _events.value
 	
-	var _flush
-	func has_flush():
+	var _flush: PBField
+	func has_flush() -> bool:
 		if data[4].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_flush():
+	func get_flush() -> Flush:
 		return _flush.value
-	func clear_flush():
+	func clear_flush() -> void:
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_flush():
+	func new_flush() -> Flush:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2710,16 +2683,16 @@ class Dto:
 		_flush.value = Flush.new()
 		return _flush.value
 	
-	var _clock
-	func has_clock():
+	var _clock: PBField
+	func has_clock() -> bool:
 		if data[5].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_clock():
+	func get_clock() -> ClockSync:
 		return _clock.value
-	func clear_clock():
+	func clear_clock() -> void:
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_clock():
+	func new_clock() -> ClockSync:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2727,13 +2700,13 @@ class Dto:
 		_clock.value = ClockSync.new()
 		return _clock.value
 	
-	func to_string():
+	func to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
-	func to_bytes():
+	func to_bytes() -> PoolByteArray:
 		return PBPacker.pack_message(data)
 		
-	func from_bytes(bytes, offset = 0, limit = -1):
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
 		var cur_limit = bytes.size()
 		if limit != -1:
 			cur_limit = limit
