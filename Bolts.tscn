@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Bolts.gd" type="Script" id=1]
+[ext_resource path="res://Bolt.tscn" type="PackedScene" id=2]
+
+[node name="Bolts" type="Node2D"]
+z_index = 101
+script = ExtResource( 1 )
+Bolt = ExtResource( 2 )

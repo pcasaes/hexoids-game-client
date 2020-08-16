@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Ship.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Player.gd" type="Script" id=2]
+
+[node name="Player" type="Node2D"]
+z_index = 101
+script = ExtResource( 2 )
+
+[node name="Ship" parent="." instance=ExtResource( 1 )]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+limit_left = 0
+limit_top = 0
+limit_right = 10000
+limit_bottom = 10000
+drag_margin_h_enabled = true
+drag_margin_v_enabled = true
