@@ -35,3 +35,6 @@ class PlayersStore:
 		
 	func all():
 		return players.values()
+		
+	func clear():
+		players.clear()

@@ -1,0 +1,67 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://gui/GUI.gd" type="Script" id=1]
+[ext_resource path="res://gui/LeaderBoard.tscn" type="PackedScene" id=2]
+[ext_resource path="res://gui/PlayerScore.tscn" type="PackedScene" id=3]
+[ext_resource path="res://gui/LatestActions.tscn" type="PackedScene" id=4]
+[ext_resource path="res://gui/NearestPlayers.tscn" type="PackedScene" id=5]
+
+[node name="GUI" type="MarginContainer"]
+modulate = Color( 1, 1, 1, 0.764706 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 8.0
+margin_top = 8.0
+margin_right = -8.0
+margin_bottom = -8.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HUD" type="HBoxContainer" parent="."]
+margin_right = 1008.0
+margin_bottom = 584.0
+rect_min_size = Vector2( 0, 584 )
+
+[node name="Left" type="VBoxContainer" parent="HUD"]
+margin_bottom = 584.0
+size_flags_vertical = 3
+
+[node name="LeaderBoard" parent="HUD/Left" instance=ExtResource( 2 )]
+margin_right = 0.0
+margin_bottom = 290.0
+size_flags_vertical = 3
+
+[node name="LatestActions" parent="HUD/Left" instance=ExtResource( 4 )]
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 294.0
+margin_bottom = 584.0
+grow_vertical = 0
+size_flags_vertical = 3
+
+[node name="Right" type="VBoxContainer" parent="HUD"]
+margin_left = 4.0
+margin_right = 1008.0
+margin_bottom = 584.0
+size_flags_horizontal = 3
+
+[node name="PlayerScore" parent="HUD/Right" instance=ExtResource( 3 )]
+anchor_left = 0.0
+anchor_right = 0.0
+margin_left = 0.0
+margin_right = 1004.0
+margin_bottom = 17.0
+
+[node name="NearestPlayers" parent="HUD/Right" instance=ExtResource( 5 )]
+anchor_left = 0.0
+anchor_right = 0.0
+margin_left = 0.0
+margin_top = 21.0
+margin_right = 1004.0
+margin_bottom = 584.0
+grow_vertical = 0
+size_flags_vertical = 3
+alignment = 2

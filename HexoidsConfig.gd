@@ -24,6 +24,7 @@ class HexoidsWorld:
 	var renderOffset = 128 setget ,get_renderOffset
 	var minimum = Vector2(0, 0) setget ,get_minimum
 	var maximum = Vector2(10000, 10000) setget ,get_maximum
+	var hud = HudConfig.new() setget ,get_hud
 
 	func get_renderOffset():
 		return renderOffset
@@ -45,3 +46,12 @@ class HexoidsWorld:
 		
 	func yToModel(y):
 		return y / float(maximum.y)
+		
+	func get_hud():
+		return hud
+		
+class HudConfig:
+	var nameLength = 7 setget ,get_nameLength
+	
+	func get_nameLength():
+		return nameLength	

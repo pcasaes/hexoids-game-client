@@ -2,6 +2,8 @@ extends Node
 
 const HexoidsProto = preload("res://HexoidsProto.gd")
 
+signal server_disconnected
+
 # domain events
 signal bolt_exhausted
 signal bolt_fired
@@ -62,7 +64,9 @@ func _on_opened(_protocol):
 	sendMessage(request)
 	
 func _on_closed():
+	print("Disconnected")
 	connected = false
+	emit_signal("server_disconnected")
 		
 func _on_error():
 	client.disconnect_from_host()	

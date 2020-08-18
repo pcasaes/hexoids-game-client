@@ -30,6 +30,7 @@ TrigUtils="*res://TrigUtils.gd"
 HClock="*res://HClock.gd"
 PlayersStore="*res://PlayersStore.gd"
 BoltsStore="*res://BoltsStore.gd"
+GUIStore="*res://gui/GUIStore.gd"
 
 [editor_plugins]
 

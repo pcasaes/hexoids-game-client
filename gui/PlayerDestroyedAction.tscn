@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://gui/PlayerDestroyedAction.gd" type="Script" id=1]
+
+[node name="PlayerDestroyedAction" type="HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Time" type="Label" parent="."]
+margin_top = 13.0
+margin_bottom = 27.0
+
+[node name="Destroyer" type="Label" parent="."]
+margin_left = 4.0
+margin_top = 13.0
+margin_right = 4.0
+margin_bottom = 27.0
+
+[node name="Action" type="Label" parent="."]
+margin_left = 8.0
+margin_top = 13.0
+margin_right = 21.0
+margin_bottom = 27.0
+text = "->"
+
+[node name="Destroyee" type="Label" parent="."]
+margin_left = 25.0
+margin_top = 13.0
+margin_right = 25.0
+margin_bottom = 27.0

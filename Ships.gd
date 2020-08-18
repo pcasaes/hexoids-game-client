@@ -17,6 +17,7 @@ func _ready():
 	Server.connect('player_spawned', self, '_on_player_spawned')
 	Server.connect('player_destroyed', self, '_on_player_destroyed')
 	Server.connect('players_list_command', self, '_on_players_list_command')
+	Server.connect('server_disconnected', self, '_on_server_disconnected')
 
 
 
@@ -51,6 +52,11 @@ func _moved(ev):
 
 func _on_player_joined(ev, _dto):
 	_created(ev)
+	
+func _on_server_disconnected():
+	for ship in players.all():
+		ship.left()
+	players.clear()	
 		
 func _on_player_left(ev, _dto):
 	var guid = ev.get_playerId().get_guid()
