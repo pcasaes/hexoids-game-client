@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://gui/GUI.gd" type="Script" id=1]
 [ext_resource path="res://gui/LeaderBoard.tscn" type="PackedScene" id=2]
 [ext_resource path="res://gui/PlayerScore.tscn" type="PackedScene" id=3]
 [ext_resource path="res://gui/LatestActions.tscn" type="PackedScene" id=4]
 [ext_resource path="res://gui/NearestPlayers.tscn" type="PackedScene" id=5]
+[ext_resource path="res://gui/RespawnMessage.tscn" type="PackedScene" id=6]
+[ext_resource path="res://gui/StartupScreen.tscn" type="PackedScene" id=7]
 
 [node name="GUI" type="MarginContainer"]
 modulate = Color( 1, 1, 1, 0.764706 )
@@ -19,7 +21,14 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="StartupScreen" parent="." instance=ExtResource( 7 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1008.0
+margin_bottom = 584.0
+
 [node name="HUD" type="HBoxContainer" parent="."]
+visible = false
 margin_right = 1008.0
 margin_bottom = 584.0
 rect_min_size = Vector2( 0, 584 )
@@ -65,3 +74,9 @@ margin_bottom = 584.0
 grow_vertical = 0
 size_flags_vertical = 3
 alignment = 2
+
+[node name="RespawnMessage" parent="." instance=ExtResource( 6 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1008.0
+margin_bottom = 584.0

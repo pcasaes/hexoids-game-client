@@ -3,6 +3,7 @@ extends Node
 const HexoidsProto = preload("res://HexoidsProto.gd")
 
 signal server_disconnected
+signal server_connected
 
 # domain events
 signal bolt_exhausted
@@ -62,6 +63,7 @@ func _on_opened(_protocol):
 	request.new_join().set_name(User.getUsername())
 	
 	sendMessage(request)
+	emit_signal("server_connected")
 	
 func _on_closed():
 	print("Disconnected")

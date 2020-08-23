@@ -1,5 +1,7 @@
 extends VBoxContainer
 
+export (PackedScene) var Entry
+
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -16,20 +18,15 @@ func _physics_process(_delta):
 	if lastEvent != null:
 		for i in range(lastEvent.get_scores().size()):
 			var entry = lastEvent.get_scores()[i]
-			var label
+			var lbEntry
 			
 			if i >= get_child_count():
-				label = Label.new()
-				add_child(label)
+				lbEntry = Entry.instance()
+				add_child(lbEntry)
 				
-			label = get_child(i)
-			var player = store.get(entry.get_playerId().get_guid())
-			if player != null:
-				label.text = player.displayName + ' ' + str(entry.get_score())
-				label.set("custom_colors/font_color", player.color)
-			else:
-				label.text = entry.get_playerId().get_guid().substr(0, HexoidsConfig.world.hud.nameLength) + ' ' + str(entry.get_score())
-				label.set("custom_colors/font_color", HexoidsColors.getDarkTextColor().color)
+			lbEntry = get_child(i)
+			lbEntry.set_entry(entry)
+			
 		lastEvent = null
 
 

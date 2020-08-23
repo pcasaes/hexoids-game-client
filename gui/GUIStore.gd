@@ -37,7 +37,7 @@ class GUIStore:
 		
 	func _on_player_left(ev, _dto):
 		players.erase(ev.get_playerId().get_guid())
-	
+
 	func _on_player_joined(ev, _dto):
 		addPlayer(ev)
 	
@@ -76,7 +76,8 @@ class GUIStore:
 		players.clear()
 		
 	func getMyPlayerId():
-		return myPlayerId;
+		return myPlayerId
+	
 
 class GUIPlayerInfo:
 	var name
