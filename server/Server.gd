@@ -1,6 +1,6 @@
 extends Node
 
-const HexoidsProto = preload("res://HexoidsProto.gd")
+const HexoidsProto = preload("res://server/HexoidsProto.gd")
 
 signal server_disconnected
 signal server_connected

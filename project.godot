@@ -21,15 +21,15 @@ config/icon="res://icon.png"
 
 [autoload]
 
-HexoidsColors="*res://Colors.gd"
-Server="*res://Server.gd"
-User="*res://User.gd"
-Uuid="*res://Uuid.gd"
-HexoidsConfig="*res://HexoidsConfig.gd"
-TrigUtils="*res://TrigUtils.gd"
-HClock="*res://HClock.gd"
-PlayersStore="*res://PlayersStore.gd"
-BoltsStore="*res://BoltsStore.gd"
+HexoidsColors="*res://utils/Colors.gd"
+Server="*res://server/Server.gd"
+User="*res://server/User.gd"
+Uuid="*res://utils/Uuid.gd"
+HexoidsConfig="*res://utils/HexoidsConfig.gd"
+TrigUtils="*res://utils/TrigUtils.gd"
+HClock="*res://utils/HClock.gd"
+PlayersStore="*res://model/PlayersStore.gd"
+BoltsStore="*res://model/bolts/BoltsStore.gd"
 GUIStore="*res://gui/GUIStore.gd"
 
 [editor_plugins]

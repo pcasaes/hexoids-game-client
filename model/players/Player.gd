@@ -1,6 +1,6 @@
 extends Node2D
 
-const HexoidsProto = preload("res://HexoidsProto.gd")
+const HexoidsProto = preload("res://server/HexoidsProto.gd")
 
 
 # Declare member variables here. Examples:

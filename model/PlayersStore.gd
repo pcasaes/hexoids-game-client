@@ -1,13 +1,15 @@
-extends Node2D
+extends Node
+
+const Ship = preload("res://model/players/Ship.tscn")
+const Player = preload("res://model/players/Player.tscn")
+
+var store = PlayersStore.new() setget ,get_store
 
 
 # Declare member variables here. Examples:
-export (PackedScene) var Ship
-export (PackedScene) var Player
+# var a = 2
+# var b = "text"
 
-var players = PlayersStore.store
-var main
-var player
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -20,60 +22,53 @@ func _ready():
 	Server.connect('server_disconnected', self, '_on_server_disconnected')
 
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
-
 func _created(ev):
 	var guid = ev.get_playerId().get_guid()
-	if players.get(guid) == null:
+	if store.get(guid) == null:
 		var ship
 		var child
 		if (guid == User.getId()):
-			player = Player.instance()
-			ship = player.ship()
-			child = player
+			store.player = Player.instance()
+			ship = store.player.ship()
+			child = store.player
 		else:
 			ship = Ship.instance()
 			child = ship
 			
-		players.set(guid, ship)
+		store.set(guid, ship)
 		ship.created(ev)
-		add_child(child)
-		ship._on_Main_main_ready(main)
-
+		store.emit_signal('player_created', ship, child)
+		
 func _moved(ev):
 	var guid = ev.get_playerId().get_guid()
-	var ship = players.get(guid)
+	var ship = store.get(guid)
 	if ship != null:
-		ship.moved(ev)
-
-
+		ship.moved(ev)	
+		
 func _on_player_joined(ev, _dto):
 	_created(ev)
 	
 func _on_server_disconnected():
-	for ship in players.all():
+	for ship in store.all():
 		ship.left()
-	players.clear()	
+	store.clear()	
 		
 func _on_player_left(ev, _dto):
 	var guid = ev.get_playerId().get_guid()
-	var ship = players.get(guid)
+	var ship = store.get(guid)
 	if ship != null:
 		ship.left(ev)
-		players.remove(guid)
+		store.remove(guid)
 
 func _on_player_destroyed(ev, _dto):
 	var guid = ev.get_playerId().get_guid()
-	var ship = players.get(guid)
+	var ship = store.get(guid)
 	if ship != null:
 		ship.destroyed()
 		
 func _on_player_spawned(ev, _dto):
 	var guid = ev.get_location().get_playerId().get_guid()
-	var ship = players.get(guid)
+	var ship = store.get(guid)
 	if ship != null:
 		ship.spawned(ev)
 
@@ -84,10 +79,35 @@ func _on_players_list_command(cmd, _dto):
 	for r in cmd.get_players():
 		_created(r)
 		_moved(r)
+				
+
+func get_store():
+	return store
+	
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+
+
+class PlayersStore:
+	
+	signal player_created
+	
+	var players = {}
+	
+	var player
+	
+	func set(guid, p):
+		players[guid] = p
 		
-
-
-func _on_Main_main_ready(m):
-	main = m
-	for s in players.all():
-		s._on_Main_main_ready(m)
+	func remove(guid):
+		players.erase(guid)
+		
+	func get(uuid):
+		return players.get(uuid)
+		
+	func all():
+		return players.values()
+		
+	func clear():
+		players.clear()
