@@ -48,7 +48,3 @@ func exhausted():
 	
 func moveTo(x, y):	
 	position = Vector2(x, y)
-		
-
-func _on_Main_main_ready(m):
-	pass

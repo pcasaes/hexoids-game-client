@@ -8,7 +8,6 @@ extends CenterContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	#$VBoxContainer/HBoxContainer/TextEdit.connect('gui_input', self, '_on_name_set')
 	$VBoxContainer/HBoxContainer/LineEdit.connect('gui_input', self, '_on_name_set')
 	$VBoxContainer/HBoxContainer/LineEdit.grab_focus()
 

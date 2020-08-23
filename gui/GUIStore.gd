@@ -22,6 +22,8 @@ func get_store():
 
 
 class GUIStore:
+	signal my_player_joined
+
 	var players = {}
 	var myPlayerId
 	
@@ -61,7 +63,8 @@ class GUIStore:
 		lbPlayer.name = p.get_name()
 		lbPlayer.displayName = toFixedWithName(p.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
 		players[p.get_playerId().get_guid()] = lbPlayer
-
+		if p.get_playerId().get_guid() == myPlayerId:
+			emit_signal('my_player_joined', lbPlayer)
 	
 	func remove(guid):
 		players.erase(guid)
@@ -77,7 +80,7 @@ class GUIStore:
 		
 	func getMyPlayerId():
 		return myPlayerId
-	
+
 
 class GUIPlayerInfo:
 	var name

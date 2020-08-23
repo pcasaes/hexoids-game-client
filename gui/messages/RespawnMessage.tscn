@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://hexoids_theme.tres" type="Theme" id=1]
-[ext_resource path="res://gui/RespawnMessage.gd" type="Script" id=2]
+[ext_resource path="res://gui/messages/RespawnMessage.gd" type="Script" id=2]
 
 [node name="RespawnMessage" type="CenterContainer"]
 visible = false
