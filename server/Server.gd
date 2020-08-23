@@ -30,10 +30,12 @@ signal live_bolts_list_command
 var client
 var connected = false;
 var joinTime
+var dto
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	dto = HexoidsProto.Dto.new();
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -75,7 +77,11 @@ func _on_error():
 	
 func _on_received():
 	var packet = client.get_peer(1).get_packet()
-	var dto = HexoidsProto.Dto.new();
+	dto.clear_events()
+	dto.clear_event()
+	dto.clear_flush()
+	dto.clear_directedCommand()
+	dto.clear_clock()
 	dto.from_bytes(packet)
 	
 	if (dto.has_events()):

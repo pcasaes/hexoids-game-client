@@ -13,6 +13,9 @@ var forwardDir = 0
 var lockAngle = false
 var lockPosition = false
 
+var requestWithAngle
+var requestWithoutAngle
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var camera = $Camera2D
@@ -26,6 +29,12 @@ func _ready():
 	var request = HexoidsProto.RequestCommand.new()
 	request.new_spawn()
 	Server.sendMessage(request)
+
+	requestWithAngle = HexoidsProto.RequestCommand.new()
+	requestWithAngle.new_move().new_angle()
+
+	requestWithoutAngle = HexoidsProto.RequestCommand.new()
+	requestWithoutAngle.new_move()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -61,13 +70,18 @@ func _input(event):
 		var _fire = request.new_fire()
 		Server.sendMessage(request)
 	elif captured and event is InputEventMouseMotion:
-		var request = HexoidsProto.RequestCommand.new()
-		var move = request.new_move()		
+		var request
+		if !lockPosition and !lockAngle or lockPosition == lockAngle:
+			request = requestWithAngle
+		else:
+			request = requestWithoutAngle
+		
+		var move = request.get_move()		
 		if !lockPosition or lockAngle == lockPosition:
 			move.set_moveX(HexoidsConfig.world.xToModel(event.relative.x))
 			move.set_moveY(HexoidsConfig.world.yToModel(event.relative.y))
 		if !lockAngle or lockAngle == lockPosition:
-			var angle = move.new_angle();
+			var angle = move.get_angle();
 			angle.set_value(atan2(event.relative.y, event.relative.x)+forwardDir)
 		
 		Server.sendMessage(request)

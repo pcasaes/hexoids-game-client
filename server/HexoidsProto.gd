@@ -2623,6 +2623,7 @@ class Dto:
 	func get_directedCommand() -> DirectedCommand:
 		return _directedCommand.value
 	func clear_directedCommand() -> void:
+		data[_directedCommand.tag].state = PB_SERVICE_STATE.UNFILLED
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_directedCommand() -> DirectedCommand:
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2640,6 +2641,7 @@ class Dto:
 	func get_event() -> Event:
 		return _event.value
 	func clear_event() -> void:
+		data[_event.tag].state = PB_SERVICE_STATE.UNFILLED
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_event() -> Event:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2657,6 +2659,7 @@ class Dto:
 	func get_events() -> Events:
 		return _events.value
 	func clear_events() -> void:
+		data[_events.tag].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_events() -> Events:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2674,6 +2677,7 @@ class Dto:
 	func get_flush() -> Flush:
 		return _flush.value
 	func clear_flush() -> void:
+		data[_flush.tag].state = PB_SERVICE_STATE.UNFILLED
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_flush() -> Flush:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2691,6 +2695,7 @@ class Dto:
 	func get_clock() -> ClockSync:
 		return _clock.value
 	func clear_clock() -> void:
+		data[_clock.tag].state = PB_SERVICE_STATE.UNFILLED
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_clock() -> ClockSync:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
