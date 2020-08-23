@@ -13,10 +13,19 @@ var store = GUIStore.store
 func _ready():
 	Server.connect('player_spawned', self, '_on_player_spawned')
 	Server.connect('player_destroyed', self, '_on_player_destroyed')
+	Server.connect('player_left', self, '_on_player_left')
+	Server.connect('server_disconnected', self, '_on_server_disconnected')
 
 func _on_player_spawned(ev, _dto):
 	if store.getMyPlayerId() == ev.get_location().get_playerId().get_guid():
 		self.visible = false
+
+func _on_player_left(ev, _dto):
+	if store.getMyPlayerId() == ev.get_playerId().get_guid():
+		self.visible = false
+
+func _on_server_disconnected():
+	self.visible = false		
 		
 func _on_player_destroyed(ev, _dto):
 	if store.getMyPlayerId() == ev.get_playerId().get_guid():

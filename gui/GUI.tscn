@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://gui/GUI.gd" type="Script" id=1]
 [ext_resource path="res://gui/leaderboard/LeaderBoard.tscn" type="PackedScene" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://gui/nearestplayers/NearestPlayers.tscn" type="PackedScene" id=5]
 [ext_resource path="res://gui/messages/RespawnMessage.tscn" type="PackedScene" id=6]
 [ext_resource path="res://gui/startupscreen/StartupScreen.tscn" type="PackedScene" id=7]
+[ext_resource path="res://gui/messages/ExpungedMessage.tscn" type="PackedScene" id=8]
 
 [node name="GUI" type="MarginContainer"]
 modulate = Color( 1, 1, 1, 0.764706 )
@@ -75,6 +76,12 @@ margin_bottom = 584.0
 grow_vertical = 0
 
 [node name="RespawnMessage" parent="." instance=ExtResource( 6 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1008.0
+margin_bottom = 584.0
+
+[node name="CenterContainer" parent="." instance=ExtResource( 8 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_right = 1008.0

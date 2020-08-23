@@ -91,6 +91,8 @@ func _on_received():
 			elif event.has_playerJoined():
 				emit_signal("player_joined", event.get_playerJoined(), dto)
 			elif event.has_playerLeft():
+				if event.get_playerLeft().get_playerId().get_guid() == User.getId():
+					client.disconnect_from_host()
 				emit_signal("player_left", event.get_playerLeft(), dto)
 			elif event.has_playerMoved():
 				emit_signal("player_moved", event.get_playerMoved(), dto)
