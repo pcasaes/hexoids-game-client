@@ -4,8 +4,10 @@ extends Node2D
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
+
+var boltId
+
 var fired_event
-var store = BoltsStore.store
 var endTime
 var velX
 var velY
@@ -18,7 +20,7 @@ func _ready():
 func _physics_process(_delta):
 	var now = HClock.clock.gameTime()
 	if endTime < now:
-		exhausted()
+		visible = false
 	else:
 		var velocityDelta = speed * (now - fired_event.get_startTimestamp())
 		var newX = fired_event.get_x() + velocityDelta * velX
@@ -41,10 +43,6 @@ func fired(ev):
 		$Wake.modulate.a = 0.7
 		ship.fired()
 
-	
-func exhausted():
-	queue_free()	
-	store.remove(fired_event.get_boltId().get_guid())	
 	
 func moveTo(x, y):	
 	position = Vector2(x, y)

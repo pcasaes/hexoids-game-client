@@ -22,6 +22,7 @@ config/icon="res://icon.png"
 [autoload]
 
 HexoidsColors="*res://utils/Colors.gd"
+ObjectPool="*res://utils/ObjectPool.gd"
 Server="*res://server/Server.gd"
 User="*res://server/User.gd"
 Uuid="*res://utils/Uuid.gd"
