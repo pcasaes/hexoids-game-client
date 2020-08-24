@@ -38,7 +38,7 @@ func fired(ev):
 	endTime = ev.get_startTimestamp() * ev.get_ttl()
 	speed = fired_event.get_speed() / 1000.0
 	var ship = PlayersStore.store.get(ev.get_ownerPlayerId().get_guid())
-	if is_instance_valid(ship):
+	if ship != null:
 		$AnimatedSprite.modulate = ship.color
 		$Wake.modulate = ship.color
 		$Wake.modulate.a = 0.7

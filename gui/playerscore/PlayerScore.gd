@@ -6,7 +6,6 @@ extends VBoxContainer
 # var b = "text"
 
 var store = GUIStore.store
-var lastEvent = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -20,11 +19,6 @@ func _ready():
 func _on_my_player_joined(player):
 	$PlayerScoreEntry.set_player(player)
 
-func _physics_process(_delta):
-	if lastEvent != null:
-		$PlayerScoreEntry.set_entry(lastEvent)
-		lastEvent = null
-
 func _on_player_score_updated(ev, _dto):
-	lastEvent = ev
+	$PlayerScoreEntry.set_entry(ev)
 		

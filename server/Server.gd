@@ -125,7 +125,7 @@ func sendMessage(message):
 	if connected:
 		client.get_peer(1).put_packet(message.to_bytes())
 
-func _process(_delta):
+func _physics_process(_delta):
 	if client.get_connection_status() == WebSocketClient.CONNECTION_DISCONNECTED:
 		return
 

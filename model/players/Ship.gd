@@ -6,11 +6,6 @@ const ANIM_THRUST_TIME = 50
 
 var create_event
 var animThrustEndTime = 0
-var current_move_event
-var current_move_event_needs_sending = false
-var needs_firing = false
-var needs_explosion = false
-var needs_spawning = false
 var color
 
 # Called when the node enters the scene tree for the first time.
@@ -34,12 +29,23 @@ func created(ev):
 	_set_visible(true)
 	
 func spawned(ev):
-	needs_spawning = true
-	moved(ev.get_location())	
+	_set_visible(true)
+	moved(ev.get_location(), true)	
 
-func moved(ev):
-	current_move_event = ev
-	current_move_event_needs_sending = true
+func moved(ev, spawned = false):
+	var thrustAngle;
+	if ev.has_method('get_thrustAngle'):
+		thrustAngle = ev.get_thrustAngle()
+	else:
+		thrustAngle = ev.get_angle()
+	
+	moveTo(
+		HexoidsConfig.world.xToView(ev.get_x()),
+		HexoidsConfig.world.yToView(ev.get_y()),
+		ev.get_angle(),
+		thrustAngle,
+		spawned
+	)	
 
 
 func moveTo(x, y, angle, thrustAngle, spawned):
@@ -70,10 +76,15 @@ func left(_ev):
 	
 func destroyed():
 	if $Ship.visible:
-		needs_explosion = true
+		$Explosion.frame = 0
+		$Explosion.play("explode")
+		_set_visible(false)
+		$Ship.stop()
+		fired()		
 
 func fired():
-	needs_firing = true
+	$FireEffect.frame = 0
+	$FireEffect.play("fire")	
 	
 func _set_visible(v):
 	$Ship.set_visible(v)	
@@ -81,45 +92,7 @@ func _set_visible(v):
 	$Wake.set_visible(v)	
 	
 func _physics_process(_delta):
-	var spawned = false
-	if needs_spawning:
-		_set_visible(true)
-		needs_spawning = false
-		spawned = true
-		
-	if needs_explosion:
-		$Explosion.frame = 0
-		$Explosion.play("explode")
-		needs_explosion = false
-		needs_firing = true
-		_set_visible(false)
-		$Ship.stop()
-	
-	if needs_firing:
-		$FireEffect.frame = 0
-		$FireEffect.play("fire")	
-		needs_firing = false	
-	
 	if $Ship.visible:
-		if current_move_event_needs_sending:
-			
-			var ev = current_move_event
-			var thrustAngle;
-			if ev.has_method('get_thrustAngle'):
-				thrustAngle = ev.get_thrustAngle()
-			else:
-				thrustAngle = ev.get_angle()
-			
-			moveTo(
-				HexoidsConfig.world.xToView(ev.get_x()),
-				HexoidsConfig.world.yToView(ev.get_y()),
-				ev.get_angle(),
-				thrustAngle,
-				spawned
-			)
-			
-			current_move_event_needs_sending = false
-			
 		var now = OS.get_ticks_msec()
 		if animThrustEndTime < now:
 			$Ship.play("rest")
