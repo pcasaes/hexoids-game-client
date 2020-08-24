@@ -58,33 +58,43 @@ func _on_player_destroyed_or_left(ev, _dto):
 		placement.erase(ev.get_playerId().get_guid())
 
 func _in_view(ev):
-	return abs(my_players_moved_event.get_x() - ev.get_x()) < DISTANCE_X and abs(my_players_moved_event.get_y() - ev.get_y()) < DISTANCE_Y
+	var xd = abs(my_players_moved_event.get_x() - ev.get_x())
+	var yd = abs(my_players_moved_event.get_y() - ev.get_y())
+	
+	if xd < DISTANCE_X and yd < DISTANCE_Y:
+		return 1.0 - min(xd / DISTANCE_X, yd / DISTANCE_X)
+	return null
 	
 func _moved(ev):
 	var playerId = ev.get_playerId().get_guid()
 	if playerId == User.getId():
 		my_players_moved_event = ev
-	elif _in_view(ev):
-		if placement.get(playerId) == null:
-			for label in get_children():
-				if !label.visible:
-					var player = store.get(playerId)
-					if player != null:
-						label.text = player.displayName
-						label.set("custom_colors/font_color", player.color)
-					else:
-						label.text = playerId.substr(0, HexoidsConfig.world.hud.nameLength)
-						label.set("custom_colors/font_color", HexoidsColors.getDarkTextColor().color)
-						
-					label.visible = true
-					placement[playerId] = label
-					break
-					
 	else:
-		var label = placement.get(playerId)
-		if label != null:
-			label.visible = false
-			placement.erase(playerId)
+		var d = _in_view(ev)
+		if d != null:
+			var l = placement.get(playerId);
+			if l == null:
+				for label in get_children():
+					if !label.visible:
+						var player = store.get(playerId)
+						if player != null:
+							label.text = player.displayName
+							label.set("custom_colors/font_color", player.color)
+						else:
+							label.text = playerId.substr(0, HexoidsConfig.world.hud.nameLength)
+							label.set("custom_colors/font_color", HexoidsColors.getDarkTextColor().color)
+							
+						label.visible = true
+						placement[playerId] = label
+						label.modulate.a = d
+						break
+			else:
+				l.modulate.a = d
+		else:
+			var label = placement.get(playerId)
+			if label != null:
+				label.visible = false
+				placement.erase(playerId)
 				
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
