@@ -47,6 +47,10 @@ func move_from(pos):
 		nextThrustSprite = (nextThrustSprite + 1) & 7
 		lastThrustFire = now		
 
+func set_visible(v):
+	for te in thrustEffects:
+		te.set_visible(v)	
+
 func set_container(c):
 	for te in thrustEffects:
 		c.add_child(te)
