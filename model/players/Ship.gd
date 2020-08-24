@@ -1,11 +1,11 @@
 extends Node2D
 
-const ANIM_THRUST_TIME = 50
+const ANIM_THRUST_TIME = 0.05
 
 # Declare member variables here. Examples:
 
 var create_event
-var animThrustEndTime = 0
+var animThrustTime = 0
 var color
 
 # Called when the node enters the scene tree for the first time.
@@ -68,7 +68,7 @@ func moveTo(x, y, angle, thrustAngle, spawned):
 	elif (abs(diff + TrigUtils.QUARTER_CIRCLE_IN_RADIANS) <= TrigUtils.EIGTH_CIRCLE_IN_RADIANS):
 		$Ship.play("r-thrust")
 
-	animThrustEndTime = OS.get_ticks_msec() + ANIM_THRUST_TIME
+	animThrustTime = 0
 	
 func left(_ev):
 	queue_free()	
@@ -93,8 +93,8 @@ func _set_visible(v):
 	
 func _physics_process(_delta):
 	if $Ship.visible:
-		var now = OS.get_ticks_msec()
-		if animThrustEndTime < now:
+		animThrustTime = animThrustTime + _delta
+		if animThrustTime > ANIM_THRUST_TIME:
 			$Ship.play("rest")
 		
 	

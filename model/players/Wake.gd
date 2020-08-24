@@ -36,16 +36,13 @@ func set_color(c):
 		te.modulate = color
 		
 func move_from(pos):
-	var now = OS.get_ticks_msec()
-	if now - lastThrustFire > 32:
-		#var diffPosition = position - nextPosition		
+	if lastThrustFire > 0.032:
 		var te = thrustEffects[nextThrustSprite]
-		#te.position = diffPosition
 		te.position = pos
 		te.frame = 0
 		te.play('thrust')
 		nextThrustSprite = (nextThrustSprite + 1) & 7
-		lastThrustFire = now		
+		lastThrustFire = 0		
 
 func set_visible(v):
 	for te in thrustEffects:
@@ -54,3 +51,6 @@ func set_visible(v):
 func set_container(c):
 	for te in thrustEffects:
 		c.add_child(te)
+
+func _physics_process(delta):
+	lastThrustFire = lastThrustFire + delta
