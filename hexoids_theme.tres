@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=3 format=2]
 
-[ext_resource path="res://fonts/moongloss/MoonGlossDisplay.tres" type="DynamicFont" id=1]
+[ext_resource path="res://fonts/electrolize-moongloss/ElectrolizeMoonGloos.tres" type="DynamicFont" id=1]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0, 0, 0, 1 )
