@@ -22,11 +22,13 @@ var sinceLastPlayer = 99999
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	for _i in range(MAX_SAMPLES):
-		prioritySamples.push_back(FireSamplePlayer.instance())
-		add_child(prioritySamples[_i])
-	for _i in range(MAX_SAMPLES):
-		samples.push_back(FireSamplePlayer.instance())
-		add_child(samples[_i])
+		var s = FireSamplePlayer.instance()
+		prioritySamples.push_back(s)
+		add_child(s)
+		
+		s = FireSamplePlayer.instance()
+		samples.push_back(s)
+		add_child(s)
 	Server.connect('bolt_fired', self, '_on_fired')
 
 
@@ -38,8 +40,10 @@ func _on_fired(ev, dto):
 		var x = HexoidsConfig.world.xToView(ev.get_x())
 		var y = HexoidsConfig.world.yToView(ev.get_y())
 		if priority:
-			_play(prioritySamples[nextPriority], x, y)
-			nextPriority = (nextPriority+1) & MAX_SAMPLES_MINUS_ONE
+			var s = prioritySamples[nextPriority]
+			if !s.playing:
+				_play(s, x, y)
+				nextPriority = (nextPriority+1) & MAX_SAMPLES_MINUS_ONE
 		elif abs(x - center.x) < MAX_DISTANCE and abs(y - center.y) < MAX_DISTANCE:
 			var s = samples[next]
 			if !s.playing:
@@ -51,6 +55,7 @@ func _play(s, x, y):
 	s.position.y = y
 	s.play(0)
 	sinceLastPlayer = 0
+	
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
