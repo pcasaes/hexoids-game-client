@@ -21,6 +21,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
+CameraStore="*res://camera/CameraStore.gd"
 HexoidsColors="*res://utils/Colors.gd"
 ObjectPool="*res://utils/ObjectPool.gd"
 Server="*res://server/Server.gd"

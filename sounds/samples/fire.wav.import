@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/fire.wav-a714da3c54398e66d4590076f289a46c.sample"
+
+[deps]
+
+source_file="res://sounds/samples/fire.wav"
+dest_files=[ "res://.import/fire.wav-a714da3c54398e66d4590076f289a46c.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=false
+edit/loop=false
+compress/mode=0

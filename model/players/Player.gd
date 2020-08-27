@@ -7,6 +7,8 @@ const HexoidsProto = preload("res://server/HexoidsProto.gd")
 # var a = 2
 # var b = "text"
 
+var cameraStore = CameraStore.store
+
 var captured = false
 
 var forwardDir = 0
@@ -19,6 +21,7 @@ var requestWithoutAngle
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var camera = $Camera2D
+	cameraStore.camera = $Camera2D
 	
 	camera.limit_bottom = HexoidsConfig.world.maximum.y
 	camera.limit_right = HexoidsConfig.world.maximum.x
@@ -39,7 +42,7 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
-#	pass
+#	cameraStore.camera = $Camera2D
 
 
 func _input(event):

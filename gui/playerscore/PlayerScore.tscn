@@ -16,7 +16,6 @@ __meta__ = {
 }
 
 [node name="PlayerScoreEntry" parent="." instance=ExtResource( 3 )]
-margin_right = 94.0
 margin_bottom = 17.0
 alignment = 2
 
