@@ -1,3 +1,39 @@
-[gd_resource type="AudioBusLayout" format=2]
+[gd_resource type="AudioBusLayout" load_steps=5 format=2]
+
+[sub_resource type="AudioEffectHighShelfFilter" id=1]
+resource_name = "HighShelfFilter"
+db = 1
+
+[sub_resource type="AudioEffectReverb" id=4]
+resource_name = "Reverb"
+damping = 0.36
+wet = 0.03
+
+[sub_resource type="AudioEffectHighShelfFilter" id=2]
+resource_name = "HighShelfFilter"
+
+[sub_resource type="AudioEffectReverb" id=3]
+resource_name = "Reverb"
+wet = 0.06
 
 [resource]
+bus/1/name = "MID"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = 0.0
+bus/1/send = "Master"
+bus/1/effect/0/effect = SubResource( 1 )
+bus/1/effect/0/enabled = true
+bus/1/effect/1/effect = SubResource( 4 )
+bus/1/effect/1/enabled = true
+bus/2/name = "BACK"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = 0.0
+bus/2/send = "Master"
+bus/2/effect/0/effect = SubResource( 2 )
+bus/2/effect/0/enabled = true
+bus/2/effect/1/effect = SubResource( 3 )
+bus/2/effect/1/enabled = true

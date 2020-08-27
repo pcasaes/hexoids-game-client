@@ -4,5 +4,6 @@
 
 [node name="FireStreamPlayer2D" type="AudioStreamPlayer2D"]
 stream = ExtResource( 1 )
-max_distance = 14150.0
-attenuation = 16.0
+max_distance = 6000.0
+attenuation = 8.0
+bus = "BACK"
