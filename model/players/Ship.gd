@@ -7,6 +7,7 @@ const ANIM_THRUST_TIME = 0.05
 var create_event
 var animThrustTime = 0
 var color
+var id
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -24,8 +25,12 @@ func _ready():
 	$Explosion.modulate = color
 	$Explosion.modulate.a=0.9
 	
+func is_players_ship():
+	return id == User.getId()
+	
 func created(ev):
 	create_event = ev
+	id = ev.get_playerId().get_guid()
 	_set_visible(true)
 	
 func spawned(ev):

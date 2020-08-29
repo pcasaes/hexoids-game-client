@@ -65,6 +65,10 @@ func _on_player_destroyed(ev, _dto):
 	var ship = store.get(guid)
 	if ship != null:
 		ship.destroyed()
+		store.emit_signal('ship_destroyed', ev.get_destroyedByPlayerId().get_guid(), ship)
+		if ship.is_players_ship():
+			store.emit_signal('users_ship_destroyed', ev.get_destroyedByPlayerId().get_guid(), ship)
+			
 		
 func _on_player_spawned(ev, _dto):
 	var guid = ev.get_location().get_playerId().get_guid()
@@ -92,6 +96,8 @@ func get_store():
 class PlayersStore:
 	
 	signal player_created
+	signal ship_destroyed
+	signal users_ship_destroyed
 	
 	var players = {}
 	

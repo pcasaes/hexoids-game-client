@@ -20,7 +20,7 @@ func get_clock():
 #	pass
 
 class HClock:
-	var offset
+	var offset = 0
 	
 	func clientTime():
 		return OS.get_system_time_msecs();
