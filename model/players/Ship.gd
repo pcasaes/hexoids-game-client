@@ -23,7 +23,13 @@ func _ready():
 	$Wake.set_color(color)
 	$Explosion.frame=8
 	$Explosion.modulate = color
+	#$Explosion.modulate = HexoidsColors.lightTextColor.getColor()
 	$Explosion.modulate.a=0.9
+
+	$PreExplosion.frame=8
+	$PreExplosion.modulate = color
+	$PreExplosion.modulate = HexoidsColors.lightTextColor.getColor()
+	#$Explosion.modulate.a=0.9
 	
 func is_players_ship():
 	return id == User.getId()
@@ -83,6 +89,8 @@ func destroyed():
 	if $Ship.visible:
 		$Explosion.frame = 0
 		$Explosion.play("explode")
+		$PreExplosion.frame = 0
+		$PreExplosion.play("explode")
 		_set_visible(false)
 		$Ship.stop()
 		fired()		

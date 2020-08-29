@@ -26,6 +26,7 @@ var pallete = []
 var _size = 0
 var primaryColor
 var darkTextColor
+var lightTextColor
 
 func create(_primaryColor, hues, offset):
 	_size = hues * 2
@@ -40,7 +41,8 @@ func create(_primaryColor, hues, offset):
 		pallete.push_back(c.transformByDegrees(offset))
 		
 	
-	darkTextColor = HexoidsColor.new("#777777")
+	darkTextColor = HexoidsColor.new("#527c85")
+	lightTextColor = HexoidsColor.new("#a1ecfb")
 
 
 func size():

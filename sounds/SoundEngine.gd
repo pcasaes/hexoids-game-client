@@ -32,8 +32,8 @@ func _play(handler, x, y, priority):
 		distSquared = 0
 	elif cameraStore.camera != null:
 		var center = cameraStore.camera.get_camera_screen_center()
-		var disX = pow(x - center.x, 2.0)
-		var disY = pow(y - center.y, 2.0)
+		var disX = pow(x - center.x, 2)
+		var disY = pow(y - center.y, 2)
 		distSquared = disY + disX
 	else:
 		distSquared = MAX_DISTANCE_SQUARED
