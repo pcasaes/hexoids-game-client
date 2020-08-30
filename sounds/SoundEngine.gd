@@ -7,11 +7,11 @@ extends Node2D
 
 const MAX_DISTANCE = 9000
 
-const MAX_DISTANCE_SQUARED = pow(MAX_DISTANCE, 2.0)
+const MAX_DISTANCE_SQUARED = pow(MAX_DISTANCE, 2)
 
-const MASTER_MAX_DISTANCE_SQUARED = pow(1000, 2.0)
+const MASTER_MAX_DISTANCE_SQUARED = pow(1000, 2)
 
-const MID_MAX_DISTANCE_SQUARED = pow(2000, 2.0)
+const MID_MAX_DISTANCE_SQUARED = pow(2000, 2)
 
 var cameraStore = CameraStore.store
 

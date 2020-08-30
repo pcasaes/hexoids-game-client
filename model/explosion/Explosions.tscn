@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://model/explosion/Explosions.gd" type="Script" id=1]
+[ext_resource path="res://model/explosion/Explosion.tscn" type="PackedScene" id=2]
+
+[node name="Explosions" type="Node2D"]
+script = ExtResource( 1 )
+explosion_scene = ExtResource( 2 )

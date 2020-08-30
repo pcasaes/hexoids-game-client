@@ -29,9 +29,6 @@ func _on_server_disconnected():
 		
 func _on_player_destroyed(ev, _dto):
 	if store.getMyPlayerId() == ev.get_playerId().get_guid():
-		var p = store.get(store.getMyPlayerId())
-		#if p != null:
-		#	$Label.set("custom_colors/font_color", p.color)			
 		self.visible = true
 	
 func _input(event):
