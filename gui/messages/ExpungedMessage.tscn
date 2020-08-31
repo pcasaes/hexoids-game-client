@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://gui/messages/ExpungedMessage.gd" type="Script" id=1]
+[ext_resource path="res://hexoids_theme.tres" type="Theme" id=2]
 
 [node name="CenterContainer" type="CenterContainer"]
 visible = false
@@ -11,11 +12,18 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="."]
-margin_left = 397.0
-margin_top = 284.0
-margin_right = 626.0
-margin_bottom = 315.0
+[node name="PanelContainer" type="PanelContainer" parent="."]
+margin_left = 505.0
+margin_top = 293.0
+margin_right = 519.0
+margin_bottom = 307.0
+theme = ExtResource( 2 )
+
+[node name="Label" type="Label" parent="PanelContainer"]
+margin_left = -108.0
+margin_top = -9.0
+margin_right = 121.0
+margin_bottom = 22.0
 custom_colors/font_color = Color( 1, 0.533333, 0, 1 )
 text = "You have been booted for inactivity.
 Press SPACEBAR to re-join."
