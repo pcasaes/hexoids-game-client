@@ -26,6 +26,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
+MathUtils="*res://utils/MathUtils.gd"
 CameraStore="*res://camera/CameraStore.gd"
 HexoidsColors="*res://utils/Colors.gd"
 ObjectPool="*res://utils/ObjectPool.gd"

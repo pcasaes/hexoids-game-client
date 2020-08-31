@@ -5,12 +5,8 @@ extends SoundHandler
 # var a = 2
 # var b = "text"
 
-const fire_res = preload("res://sounds/samples/fire_res.tscn")
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	type = fire_res
 	Server.connect('bolt_fired', self, '_on_fired')
 
 

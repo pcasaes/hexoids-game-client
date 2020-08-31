@@ -25,7 +25,7 @@ func _ready():
 #func _process(delta):
 #	pass
 
-func _play(handler, x, y, priority):
+func _play(s, x, y, priority):
 	var distSquared
 	
 	if priority:
@@ -40,10 +40,10 @@ func _play(handler, x, y, priority):
 
 	
 	if distSquared < MAX_DISTANCE_SQUARED:
-		var s = handler.new_player()
 		s.max_distance = MAX_DISTANCE
 		if priority:
 			s.attenuation = 1
+			s.volume_db = 0
 		else:
 			s.attenuation = 8
 			s.volume_db = -0.5
@@ -58,5 +58,4 @@ func _play(handler, x, y, priority):
 		else:
 			s.set_bus("BACK")
 			
-		s.connect('finished', s, 'queue_free')			
-		add_child(s)
+		s.play(0)
