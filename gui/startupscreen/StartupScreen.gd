@@ -14,10 +14,11 @@ func _ready():
 	_on_resize()
 
 func _on_resize():
-	$ColorRect.rect_min_size.x = $ColorRect/VBoxContainer.rect_size.x + 80
-	$ColorRect.rect_min_size.y = $ColorRect/VBoxContainer.rect_size.y + 40
-	$ColorRect/VBoxContainer.rect_position.x = 40
-	$ColorRect/VBoxContainer.rect_position.y = 20
+	#$OutlineBox.rect_min_size.x = $OutlineBox/VBoxContainer.rect_size.x + 80
+	#$OutlineBox.rect_min_size.y = $OutlineBox/VBoxContainer.rect_size.y + 40
+	#$OutlineBox/VBoxContainer.rect_position.x = 40
+	#$OutlineBox/VBoxContainer.rect_position.y = 20
+	pass
 	
 	
 func _on_text_changed(newtext):
@@ -36,4 +37,4 @@ func _on_name_set(ev):
 #	pass
 
 func _get_line_edit():
-	return $ColorRect/VBoxContainer/HBoxContainer/LineEdit
+	return $OutlineBox/VBoxContainer/HBoxContainer/LineEdit

@@ -12,15 +12,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="OutlineBox" type="PanelContainer" parent="."]
 margin_left = 269.0
 margin_top = 195.0
 margin_right = 755.0
 margin_bottom = 404.0
-rect_min_size = Vector2( 486, 209 )
-color = Color( 0.0156863, 0.137255, 0.160784, 0.65098 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
+[node name="VBoxContainer" type="VBoxContainer" parent="OutlineBox"]
 margin_left = 40.0
 margin_top = 20.0
 margin_right = 446.0
@@ -31,25 +29,25 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ColorRect/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="OutlineBox/VBoxContainer"]
 margin_right = 406.0
 margin_bottom = 30.0
 
-[node name="Label" type="Label" parent="ColorRect/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="OutlineBox/VBoxContainer/HBoxContainer"]
 margin_top = 5.0
 margin_right = 130.0
 margin_bottom = 25.0
 custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 text = "Enter Name:"
 
-[node name="LineEdit" type="LineEdit" parent="ColorRect/VBoxContainer/HBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="OutlineBox/VBoxContainer/HBoxContainer"]
 margin_left = 134.0
 margin_right = 288.0
 margin_bottom = 30.0
 rect_min_size = Vector2( 80, 0 )
 max_length = 7
 
-[node name="Label" type="Label" parent="ColorRect/VBoxContainer"]
+[node name="Label" type="Label" parent="OutlineBox/VBoxContainer"]
 margin_top = 34.0
 margin_right = 406.0
 margin_bottom = 169.0
@@ -60,3 +58,12 @@ C to fire.
 Z pressed to lock direction.
 X pressed to lock position.
 https://github.com/pcasaes/hexoids"
+
+[node name="OutlineBox2" type="ColorRect" parent="."]
+visible = false
+margin_left = 269.0
+margin_top = 195.0
+margin_right = 755.0
+margin_bottom = 404.0
+rect_min_size = Vector2( 486, 209 )
+color = Color( 0.0156863, 0.137255, 0.160784, 0.65098 )
