@@ -41,8 +41,8 @@ func create(_primaryColor, hues, offset):
 		pallete.push_back(c.transformByDegrees(offset))
 		
 	
-	darkTextColor = HexoidsColor.new("#527c85")
-	lightTextColor = HexoidsColor.new("#a1ecfb")
+	darkTextColor = HexoidsColor.new("#126575")
+	lightTextColor = HexoidsColor.new("#26dafd")
 
 
 func size():
@@ -57,5 +57,5 @@ func getDarkTextColor():
 
 
 func _init():
-	create('#ff8800', 6, 20)
+	create('#26dafd', 6, 20)
 	

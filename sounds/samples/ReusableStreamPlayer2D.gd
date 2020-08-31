@@ -75,7 +75,7 @@ func _dist():
 	var center = cameraStore.camera.get_camera_screen_center()
 	var disX = pow(position.x - center.x, 2)
 	var disY = pow(position.y - center.y, 2)
-	var distSquared = (disY + disX) #- viewable_size_squared.x
+	var distSquared = (disY + disX)
 	
 	if distSquared < _max_distance_squared:
 		if distSquared > 0:

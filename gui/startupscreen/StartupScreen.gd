@@ -8,16 +8,25 @@ extends CenterContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$VBoxContainer/HBoxContainer/LineEdit.connect('gui_input', self, '_on_name_set')
-	$VBoxContainer/HBoxContainer/LineEdit.grab_focus()
+	_get_line_edit().connect('gui_input', self, '_on_name_set')
+	_get_line_edit().grab_focus()
+	get_tree().get_root().connect("size_changed", self, "_on_resize")
+	_on_resize()
 
+func _on_resize():
+	$ColorRect.rect_min_size.x = $ColorRect/VBoxContainer.rect_size.x + 80
+	$ColorRect.rect_min_size.y = $ColorRect/VBoxContainer.rect_size.y + 40
+	$ColorRect/VBoxContainer.rect_position.x = 40
+	$ColorRect/VBoxContainer.rect_position.y = 20
+	
+	
 func _on_text_changed(newtext):
 	print(newtext)
 	
 func _on_name_set(ev):
 	if ev is InputEventKey and ev.is_pressed() and ev.scancode == KEY_ENTER:
-		if $VBoxContainer/HBoxContainer/LineEdit.text.length() >= 3:
-			User.username = $VBoxContainer/HBoxContainer/LineEdit.text
+		if _get_line_edit().text.length() >= 3:
+			User.username = _get_line_edit().text
 			self.visible = false
 			Server.start()
 			self.queue_free()
@@ -25,3 +34,6 @@ func _on_name_set(ev):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func _get_line_edit():
+	return $ColorRect/VBoxContainer/HBoxContainer/LineEdit
