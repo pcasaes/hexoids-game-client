@@ -14,7 +14,7 @@ func _ready():
 	Server.connect('server_connected', self, '_on_server_connected')
 
 func _on_player_left(ev, _dto):
-	if User.getId() == ev.get_playerId().get_guid():
+	if User.is_user_from_guid(ev.get_playerId()):
 		_on_server_disconnected()
 
 func _on_server_disconnected():
@@ -24,7 +24,7 @@ func _on_server_connected():
 	self.visible = false
 		
 func _on_player_destroyed(ev, _dto):
-	if User.getId() == ev.get_playerId().get_guid():
+	if User.is_user_from_guid(ev.get_playerId()):
 		self.visible = true
 	
 func _input(event):

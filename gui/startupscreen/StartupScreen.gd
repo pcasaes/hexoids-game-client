@@ -10,15 +10,9 @@ extends CenterContainer
 func _ready():
 	_get_line_edit().connect('gui_input', self, '_on_name_set')
 	_get_line_edit().grab_focus()
-	get_tree().get_root().connect("size_changed", self, "_on_resize")
-	_on_resize()
-
-func _on_resize():
-	#$OutlineBox.rect_min_size.x = $OutlineBox/VBoxContainer.rect_size.x + 80
-	#$OutlineBox.rect_min_size.y = $OutlineBox/VBoxContainer.rect_size.y + 40
-	#$OutlineBox/VBoxContainer.rect_position.x = 40
-	#$OutlineBox/VBoxContainer.rect_position.y = 20
-	pass
+	if User.username != null:
+		_get_line_edit().text = User.username
+		_get_line_edit().caret_position = User.username.length()	
 	
 	
 func _on_text_changed(newtext):

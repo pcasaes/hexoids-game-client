@@ -1,6 +1,8 @@
 extends Node
 
 const HexoidsProto = preload("res://server/HexoidsProto.gd")
+const CONFIG_FILE = "user://server.cfg"
+
 
 signal server_disconnected
 signal server_connected
@@ -32,9 +34,20 @@ var connected = false;
 var joinTime
 var dto
 
+var _config
+var _host
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	_config = ConfigFile.new()
+	var err = _config.load(CONFIG_FILE)
+	if err == OK:
+		_host = _config.get_value("server", "host", "ws://daedalus:28080")
+	else:
+		_host = "ws://daedalus:28080"
+		_config.set_value("server", "host", _host)
+		_config.save(CONFIG_FILE)
+		
 	dto = HexoidsProto.Dto.new();
 
 
@@ -51,8 +64,8 @@ func _init():
 	client.connect("data_received", self, "_on_received")
 
 func start():
-	print("Starting server for user " + User.getId())
-	var endpoint = 'ws://daedalus:28080/game/' + User.getId()
+	print("Starting server for user " + User.id)
+	var endpoint = _host + '/game/' + User.id
 	var err = client.connect_to_url(endpoint)
 	print("Connection status: " + str(err))
 	
@@ -62,7 +75,7 @@ func _on_opened(_protocol):
 	print("connected to host")
 	joinTime = HClock.clock.clientTime()
 	var request = HexoidsProto.RequestCommand.new()
-	request.new_join().set_name(User.getUsername())
+	request.new_join().set_name(User.username)
 	
 	sendMessage(request)
 	emit_signal("server_connected")
@@ -97,7 +110,7 @@ func _on_received():
 			elif event.has_playerJoined():
 				emit_signal("player_joined", event.get_playerJoined(), dto)
 			elif event.has_playerLeft():
-				if event.get_playerLeft().get_playerId().get_guid() == User.getId():
+				if event.get_playerLeft().get_playerId().get_guid() == User.id:
 					client.disconnect_from_host()
 				emit_signal("player_left", event.get_playerLeft(), dto)
 			elif event.has_playerMoved():

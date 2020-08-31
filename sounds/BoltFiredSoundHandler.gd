@@ -11,7 +11,7 @@ func _ready():
 
 
 func _on_fired(ev, _dto):
-	var priority = ev.get_ownerPlayerId().get_guid() == User.getId()	
+	var priority = User.is_user_from_guid(ev.get_ownerPlayerId())	
 	play_in_model(priority, ev.get_x(), ev.get_y())
 
 

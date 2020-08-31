@@ -46,6 +46,7 @@ margin_right = 288.0
 margin_bottom = 30.0
 rect_min_size = Vector2( 80, 0 )
 max_length = 7
+caret_blink = true
 
 [node name="Label" type="Label" parent="OutlineBox/VBoxContainer"]
 margin_top = 34.0

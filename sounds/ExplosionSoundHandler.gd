@@ -12,6 +12,6 @@ func _ready():
 	playerStore.connect('ship_destroyed', self, '_ship_destroyed')
 	
 func _ship_destroyed(destroyerId, ship):
-		var priority = ship.is_players_ship() or destroyerId == User.getId()	
+		var priority = ship.is_players_ship() or destroyerId == User.id	
 		play_in_view(priority, ship.position.x, ship.position.y)
 	

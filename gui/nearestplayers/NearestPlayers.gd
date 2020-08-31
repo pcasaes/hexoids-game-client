@@ -67,7 +67,7 @@ func _in_view(ev):
 	
 func _moved(ev):
 	var playerId = ev.get_playerId().get_guid()
-	if playerId == User.getId():
+	if playerId == User.id:
 		my_players_moved_event = ev
 	else:
 		var d = _in_view(ev)
