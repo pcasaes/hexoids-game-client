@@ -36,7 +36,7 @@ func _play(s, x, y, priority):
 	
 	if priority:
 		distSquared = 0
-	elif cameraStore.camera != null:
+	elif is_instance_valid(cameraStore.camera):
 		var center = cameraStore.camera.get_camera_screen_center()
 		var disX = pow(x - center.x, 2)
 		var disY = pow(y - center.y, 2)

@@ -63,7 +63,7 @@ func set_bus(b):
 	$Right.set_bus(b + RIGHT_SUFFIX)
 	
 func play(_p):
-	if cameraStore.camera != null:
+	if is_instance_valid(cameraStore.camera):
 		_pan()
 		_dist()
 		_apply_db()

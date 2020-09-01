@@ -53,7 +53,7 @@ func _on_player_spawned(ev, _dto):
 			
 func _on_player_destroyed_or_left(ev, _dto):
 	var label = placement.get(ev.get_playerId().get_guid())
-	if label != null:
+	if is_instance_valid(label):
 		label.visible = false
 		placement.erase(ev.get_playerId().get_guid())
 
@@ -73,7 +73,7 @@ func _moved(ev):
 		var d = _in_view(ev)
 		if d != null:
 			var l = placement.get(playerId);
-			if l == null:
+			if !is_instance_valid(l):
 				for label in get_children():
 					if !label.visible:
 						var player = store.get(playerId)
@@ -92,7 +92,7 @@ func _moved(ev):
 				l.modulate.a = d
 		else:
 			var label = placement.get(playerId)
-			if label != null:
+			if is_instance_valid(label):
 				label.visible = false
 				placement.erase(playerId)
 				

@@ -32,7 +32,6 @@ signal live_bolts_list_command
 var client
 var connected = false;
 var joinTime
-var dto
 
 var _config
 var _host
@@ -42,13 +41,12 @@ func _ready():
 	_config = ConfigFile.new()
 	var err = _config.load(CONFIG_FILE)
 	if err == OK:
-		_host = _config.get_value("server", "host", "ws://daedalus:28080")
+		_host = _config.get_value("server", "host", "ws://hexoids.duckdns.org:28080")
 	else:
-		_host = "ws://daedalus:28080"
+		_host = "ws://hexoids.duckdns.org:28080"
 		_config.set_value("server", "host", _host)
 		_config.save(CONFIG_FILE)
 		
-	dto = HexoidsProto.Dto.new();
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -90,11 +88,7 @@ func _on_error():
 	
 func _on_received():
 	var packet = client.get_peer(1).get_packet()
-	dto.clear_events()
-	dto.clear_event()
-	dto.clear_flush()
-	dto.clear_directedCommand()
-	dto.clear_clock()
+	var dto = HexoidsProto.Dto.new();
 	dto.from_bytes(packet)
 	
 	if (dto.has_events()):

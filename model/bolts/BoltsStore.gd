@@ -34,17 +34,19 @@ func _on_fired(ev, _dto):
 func _on_exhausted(ev, _dto):
 	var boltId = ev.get_boltId().get_guid()
 	var bolt = store.get(boltId)
-	if bolt != null:
+	if is_instance_valid(bolt):
 		_destroy(bolt)
 
 func _on_server_disconnected():
-	for bolt in store.all():
+	var all = store.all().duplicate()
+	for bolt in all:
 		_destroy(bolt)
 
 func _destroy(bolt):
 	store.emit_signal("bolt_destroyed", bolt)
-	pool.returnObject(bolt)
 	store.remove(bolt.boltId)
+	bolt.visible = false
+	pool.returnObject(bolt)
 			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

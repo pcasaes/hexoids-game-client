@@ -24,7 +24,7 @@ func _ready():
 
 func _created(ev):
 	var guid = ev.get_playerId().get_guid()
-	if store.get(guid) == null:
+	if !is_instance_valid(store.get(guid)):
 		var ship
 		var child
 		if (guid == User.id):
@@ -42,28 +42,29 @@ func _created(ev):
 func _moved(ev):
 	var guid = ev.get_playerId().get_guid()
 	var ship = store.get(guid)
-	if ship != null:
+	if is_instance_valid(ship):
 		ship.moved(ev)	
 		
 func _on_player_joined(ev, _dto):
 	_created(ev)
 	
 func _on_server_disconnected():
-	for ship in store.all():
+	var all = store.all().duplicate()
+	store.clear()
+	for ship in all:
 		ship.left()
-	store.clear()	
 		
 func _on_player_left(ev, _dto):
 	var guid = ev.get_playerId().get_guid()
 	var ship = store.get(guid)
-	if ship != null:
-		ship.left(ev)
+	if is_instance_valid(ship):
 		store.remove(guid)
+		ship.left(ev)
 
 func _on_player_destroyed(ev, _dto):
 	var guid = ev.get_playerId().get_guid()
 	var ship = store.get(guid)
-	if ship != null:
+	if is_instance_valid(ship):
 		ship.destroyed()
 		store.emit_signal('ship_destroyed', ev.get_destroyedByPlayerId().get_guid(), ship)
 		if ship.is_players_ship():
@@ -73,7 +74,7 @@ func _on_player_destroyed(ev, _dto):
 func _on_player_spawned(ev, _dto):
 	var guid = ev.get_location().get_playerId().get_guid()
 	var ship = store.get(guid)
-	if ship != null:
+	if is_instance_valid(ship):
 		ship.spawned(ev)
 
 func _on_player_moved(ev, _dto):
