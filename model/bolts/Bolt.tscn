@@ -1,7 +1,8 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://model/bolts/Bolt.gd" type="Script" id=1]
 [ext_resource path="res://assets/bolt/white-anim.png" type="Texture" id=2]
+[ext_resource path="res://assets/ship/thrust3-sheet.png" type="Texture" id=3]
 
 [sub_resource type="AtlasTexture" id=1]
 flags = 4
@@ -31,30 +32,35 @@ animations = [ {
 "speed": 20.0
 } ]
 
-[sub_resource type="AtlasTexture" id=6]
-flags = 4
-atlas = ExtResource( 2 )
-region = Rect2( 0, 0, 128, 128 )
-
-[sub_resource type="AtlasTexture" id=7]
-flags = 4
-atlas = ExtResource( 2 )
-region = Rect2( 128, 0, 128, 128 )
-
 [sub_resource type="AtlasTexture" id=8]
 flags = 4
-atlas = ExtResource( 2 )
-region = Rect2( 256, 0, 128, 128 )
+atlas = ExtResource( 3 )
+region = Rect2( 128, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=9]
 flags = 4
-atlas = ExtResource( 2 )
-region = Rect2( 384, 0, 128, 128 )
+atlas = ExtResource( 3 )
+region = Rect2( 192, 0, 64, 64 )
 
-[sub_resource type="SpriteFrames" id=10]
+[sub_resource type="AtlasTexture" id=10]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 256, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=11]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 320, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=14]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 512, 0, 64, 64 )
+
+[sub_resource type="SpriteFrames" id=15]
 animations = [ {
-"frames": [ SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ) ],
-"loop": false,
+"frames": [ SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 14 ) ],
+"loop": true,
 "name": "default",
 "speed": 30.0
 } ]
@@ -70,7 +76,7 @@ frames = SubResource( 5 )
 frame = 1
 
 [node name="Wake" type="AnimatedSprite" parent="."]
-modulate = Color( 1, 1, 1, 0.701961 )
+scale = Vector2( 0.2, 0.2 )
 z_index = 1
 z_as_relative = false
-frames = SubResource( 10 )
+frames = SubResource( 15 )

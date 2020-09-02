@@ -41,7 +41,7 @@ func fired(ev):
 	if ship != null:
 		$AnimatedSprite.modulate = ship.color
 		$Wake.modulate = ship.color
-		$Wake.modulate.a = 0.7
+		$Wake.modulate.a = 0.9
 		ship.fired()
 
 	
