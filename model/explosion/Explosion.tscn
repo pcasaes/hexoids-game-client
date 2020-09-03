@@ -112,7 +112,7 @@ animations = [ {
 
 [node name="Explosion" type="Node2D"]
 scale = Vector2( 1.5, 1.5 )
-z_index = 1
+z_index = 5
 z_as_relative = false
 script = ExtResource( 2 )
 
@@ -121,6 +121,5 @@ frames = SubResource( 10 )
 animation = "explode"
 
 [node name="Glow" type="AnimatedSprite" parent="."]
-scale = Vector2( 1, 1 )
 frames = SubResource( 20 )
 animation = "explode"
