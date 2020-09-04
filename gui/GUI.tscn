@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://gui/GUI.gd" type="Script" id=1]
 [ext_resource path="res://gui/leaderboard/LeaderBoard.tscn" type="PackedScene" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://gui/messages/RespawnMessage.tscn" type="PackedScene" id=6]
 [ext_resource path="res://gui/startupscreen/StartupScreen.tscn" type="PackedScene" id=7]
 [ext_resource path="res://gui/messages/ExpungedMessage.tscn" type="PackedScene" id=8]
+[ext_resource path="res://gui/boltsavailable/BoltsAvailable.tscn" type="PackedScene" id=9]
 
 [node name="GUI" type="MarginContainer"]
 anchor_right = 1.0
@@ -49,6 +50,22 @@ anchor_bottom = 0.0
 margin_top = 294.0
 margin_bottom = 584.0
 grow_vertical = 0
+size_flags_vertical = 3
+
+[node name="Middle" type="VBoxContainer" parent="HUD"]
+margin_right = 40.0
+margin_bottom = 40.0
+grow_horizontal = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+
+[node name="BoltsAvailable" parent="HUD/Middle" instance=ExtResource( 9 )]
+anchor_right = 0.0
+margin_left = 14.0
+margin_top = 14.0
+margin_right = 26.0
+margin_bottom = 26.0
+size_flags_horizontal = 5
 size_flags_vertical = 3
 
 [node name="Right" type="VBoxContainer" parent="HUD"]

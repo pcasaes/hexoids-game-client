@@ -179,7 +179,7 @@ class PBPacker:
 				value = 1
 			else:
 				value = 0
-		for _i in range(9):
+		for i in range(9):
 			var b = value & 0x7F
 			value >>= 7
 			if value:
@@ -202,7 +202,7 @@ class PBPacker:
 			spb.put_double(value)
 			bytes = spb.get_data_array()
 		else:
-			for _i in range(count):
+			for i in range(count):
 				bytes.append(value & 0xFF)
 				value >>= 8
 		return bytes
@@ -565,7 +565,7 @@ class PBPacker:
 	
 	static func tabulate(text : String, nesting : int) -> String:
 		var tab : String = ""
-		for _i in range(nesting):
+		for i in range(nesting):
 			tab += DEBUG_TAB
 		return tab + text
 	
@@ -2291,6 +2291,12 @@ class PlayersListCommandDto:
 		service.func_ref = funcref(self, "add_players")
 		data[_players.tag] = service
 		
+		_boltsAvailable = PBField.new("boltsAvailable", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _boltsAvailable
+		service.func_ref = funcref(self, "new_boltsAvailable")
+		data[_boltsAvailable.tag] = service
+		
 	var data = {}
 	
 	var _players: PBField
@@ -2302,6 +2308,15 @@ class PlayersListCommandDto:
 		var element = PlayerDto.new()
 		_players.value.append(element)
 		return element
+	
+	var _boltsAvailable: PBField
+	func get_boltsAvailable() -> BoltsAvailableCommandDto:
+		return _boltsAvailable.value
+	func clear_boltsAvailable() -> void:
+		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_boltsAvailable() -> BoltsAvailableCommandDto:
+		_boltsAvailable.value = BoltsAvailableCommandDto.new()
+		return _boltsAvailable.value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
@@ -2407,6 +2422,46 @@ class LiveBoltListCommandDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+class BoltsAvailableCommandDto:
+	func _init():
+		var service
+		
+		_available = PBField.new("available", PB_DATA_TYPE.INT32, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.INT32])
+		service = PBServiceField.new()
+		service.field = _available
+		data[_available.tag] = service
+		
+	var data = {}
+	
+	var _available: PBField
+	func get_available() -> int:
+		return _available.value
+	func clear_available() -> void:
+		_available.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
+	func set_available(value : int) -> void:
+		_available.value = value
+	
+	func to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PoolByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
 class DirectedCommand:
 	func _init():
 		var service
@@ -2435,6 +2490,12 @@ class DirectedCommand:
 		service.func_ref = funcref(self, "new_liveBoltsList")
 		data[_liveBoltsList.tag] = service
 		
+		_boltsAvailable = PBField.new("boltsAvailable", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 5, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _boltsAvailable
+		service.func_ref = funcref(self, "new_boltsAvailable")
+		data[_boltsAvailable.tag] = service
+		
 	var data = {}
 	
 	var _playerId: PBField
@@ -2458,6 +2519,7 @@ class DirectedCommand:
 	func new_playersList() -> PlayersListCommandDto:
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playersList.value = PlayersListCommandDto.new()
 		return _playersList.value
 	
@@ -2473,6 +2535,7 @@ class DirectedCommand:
 	func new_playerScoreUpdate() -> PlayerScoreUpdateCommandDto:
 		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerScoreUpdate.value = PlayerScoreUpdateCommandDto.new()
 		return _playerScoreUpdate.value
 	
@@ -2488,8 +2551,25 @@ class DirectedCommand:
 	func new_liveBoltsList() -> LiveBoltListCommandDto:
 		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = LiveBoltListCommandDto.new()
 		return _liveBoltsList.value
+	
+	var _boltsAvailable: PBField
+	func has_boltsAvailable() -> bool:
+		if data[5].state == PB_SERVICE_STATE.FILLED:
+			return true
+		return false
+	func get_boltsAvailable() -> BoltsAvailableCommandDto:
+		return _boltsAvailable.value
+	func clear_boltsAvailable() -> void:
+		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_boltsAvailable() -> BoltsAvailableCommandDto:
+		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_boltsAvailable.value = BoltsAvailableCommandDto.new()
+		return _boltsAvailable.value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
@@ -2623,7 +2703,6 @@ class Dto:
 	func get_directedCommand() -> DirectedCommand:
 		return _directedCommand.value
 	func clear_directedCommand() -> void:
-		data[_directedCommand.tag].state = PB_SERVICE_STATE.UNFILLED
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_directedCommand() -> DirectedCommand:
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2641,7 +2720,6 @@ class Dto:
 	func get_event() -> Event:
 		return _event.value
 	func clear_event() -> void:
-		data[_event.tag].state = PB_SERVICE_STATE.UNFILLED
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_event() -> Event:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2659,7 +2737,6 @@ class Dto:
 	func get_events() -> Events:
 		return _events.value
 	func clear_events() -> void:
-		data[_events.tag].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_events() -> Events:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2677,7 +2754,6 @@ class Dto:
 	func get_flush() -> Flush:
 		return _flush.value
 	func clear_flush() -> void:
-		data[_flush.tag].state = PB_SERVICE_STATE.UNFILLED
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_flush() -> Flush:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
@@ -2695,7 +2771,6 @@ class Dto:
 	func get_clock() -> ClockSync:
 		return _clock.value
 	func clear_clock() -> void:
-		data[_clock.tag].state = PB_SERVICE_STATE.UNFILLED
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_clock() -> ClockSync:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]

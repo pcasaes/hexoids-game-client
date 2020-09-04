@@ -24,6 +24,7 @@ signal score_board_updated
 signal players_list_command
 signal player_score_update_command
 signal live_bolts_list_command
+signal bolts_available_command
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -119,10 +120,13 @@ func _on_received():
 				emit_signal("score_board_updated", event.get_scoreBoardUpdated(), dto)
 	elif (dto.has_directedCommand()):
 		var command = dto.get_directedCommand()
-		if (command.has_playersList()):
-			emit_signal("players_list_command", command.get_playersList(), dto)
+		if (command.has_boltsAvailable()):
+			emit_signal("bolts_available_command", command.get_boltsAvailable(), dto)
 		elif (command.has_playerScoreUpdate()):
 			emit_signal("player_score_update_command", command.get_playerScoreUpdate(), dto)
+		elif (command.has_playersList()):
+			emit_signal("players_list_command", command.get_playersList(), dto)
+			emit_signal("bolts_available_command", command.get_playersList().get_boltsAvailable(), dto)
 		elif (command.has_liveBoltsList()):
 			emit_signal("live_bolts_list_command", command.get_liveBoltsList(), dto)
 	elif (dto.has_clock()):

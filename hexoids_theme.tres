@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=4 format=2]
+[gd_resource type="Theme" load_steps=6 format=2]
 
 [ext_resource path="res://fonts/electrolize-moongloss/ElectrolizeMoonGloos.tres" type="DynamicFont" id=1]
 
@@ -11,6 +11,20 @@ content_margin_right = 40.0
 content_margin_top = 20.0
 content_margin_bottom = 20.0
 bg_color = Color( 0.0156863, 0.137255, 0.160784, 0.65098 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.14902, 0.854902, 0.992157, 1 )
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -37,3 +51,8 @@ LineEdit/styles/focus = SubResource( 1 )
 LineEdit/styles/normal = null
 LineEdit/styles/read_only = null
 PanelContainer/styles/panel = SubResource( 2 )
+ProgressBar/colors/font_color = Color( 0.94, 0.94, 0.94, 1 )
+ProgressBar/colors/font_color_shadow = Color( 0, 0, 0, 1 )
+ProgressBar/fonts/font = null
+ProgressBar/styles/bg = SubResource( 3 )
+ProgressBar/styles/fg = SubResource( 4 )
