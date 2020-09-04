@@ -18,12 +18,6 @@ var cameraStore = CameraStore.store
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	if OS.has_feature('JavaScript'):
-		var mid_index = AudioServer.get_bus_index('MID')
-		var back_index = AudioServer.get_bus_index('BACK')
-		AudioServer.remove_bus_effect(mid_index, 1)
-		AudioServer.remove_bus_effect(back_index, 1)
-
 	for c in get_children():
 		c.connect('play', self, '_play')
 
