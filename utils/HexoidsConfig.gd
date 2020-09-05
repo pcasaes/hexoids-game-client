@@ -51,7 +51,7 @@ class HexoidsWorld:
 		return hud
 		
 class HudConfig:
-	var nameLength = 7 setget ,get_nameLength
+	var nameLength = 8 setget ,get_nameLength
 	
 	func get_nameLength():
 		return nameLength	

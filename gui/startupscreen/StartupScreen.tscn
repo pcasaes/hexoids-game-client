@@ -13,52 +13,98 @@ __meta__ = {
 }
 
 [node name="OutlineBox" type="PanelContainer" parent="."]
-margin_left = 269.0
-margin_top = 195.0
-margin_right = 755.0
-margin_bottom = 404.0
+margin_left = 242.0
+margin_top = 153.0
+margin_right = 782.0
+margin_bottom = 447.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="OutlineBox"]
 margin_left = 40.0
 margin_top = 20.0
-margin_right = 446.0
-margin_bottom = 189.0
+margin_right = 500.0
+margin_bottom = 274.0
 grow_vertical = 2
+custom_constants/separation = 6
 alignment = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="OutlineBox/VBoxContainer"]
-margin_right = 406.0
-margin_bottom = 30.0
+[node name="GridContainer" type="GridContainer" parent="OutlineBox/VBoxContainer"]
+margin_right = 460.0
+margin_bottom = 64.0
+columns = 2
 
-[node name="Label" type="Label" parent="OutlineBox/VBoxContainer/HBoxContainer"]
-margin_top = 5.0
-margin_right = 130.0
-margin_bottom = 25.0
+[node name="NameLabel" type="Label" parent="OutlineBox/VBoxContainer/GridContainer"]
+margin_right = 86.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 86, 0 )
 custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
-text = "Enter Name:"
+text = "Name"
 
-[node name="LineEdit" type="LineEdit" parent="OutlineBox/VBoxContainer/HBoxContainer"]
-margin_left = 134.0
-margin_right = 288.0
-margin_bottom = 30.0
-rect_min_size = Vector2( 80, 0 )
-max_length = 7
+[node name="NameEdit" type="LineEdit" parent="OutlineBox/VBoxContainer/GridContainer"]
+margin_left = 90.0
+margin_right = 460.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 370, 0 )
+max_length = 8
 caret_blink = true
 
+[node name="ServerLabel" type="Label" parent="OutlineBox/VBoxContainer/GridContainer"]
+margin_top = 24.0
+margin_right = 86.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 86, 0 )
+custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
+text = "Server"
+
+[node name="ServerEdit" type="LineEdit" parent="OutlineBox/VBoxContainer/GridContainer"]
+margin_left = 90.0
+margin_top = 24.0
+margin_right = 460.0
+margin_bottom = 44.0
+
+[node name="separator" type="Control" parent="OutlineBox/VBoxContainer/GridContainer"]
+margin_top = 48.0
+margin_right = 86.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 0, 16 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="OutlineBox/VBoxContainer"]
+margin_top = 70.0
+margin_right = 460.0
+margin_bottom = 110.0
+custom_constants/separation = 32
+alignment = 1
+
+[node name="Start" type="Button" parent="OutlineBox/VBoxContainer/HBoxContainer"]
+margin_left = 96.0
+margin_right = 214.0
+margin_bottom = 40.0
+text = "START"
+
+[node name="Reset" type="Button" parent="OutlineBox/VBoxContainer/HBoxContainer"]
+margin_left = 246.0
+margin_right = 364.0
+margin_bottom = 40.0
+text = "RESET"
+
 [node name="Label" type="Label" parent="OutlineBox/VBoxContainer"]
-margin_top = 34.0
-margin_right = 406.0
-margin_bottom = 169.0
+margin_top = 116.0
+margin_right = 460.0
+margin_bottom = 228.0
 custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 text = "
 Trackpad/Mouse for movements.
 C to fire.
 Z pressed to lock direction.
-X pressed to lock position.
-https://github.com/pcasaes/hexoids"
+X pressed to lock position."
+
+[node name="LinkButton" type="LinkButton" parent="OutlineBox/VBoxContainer"]
+margin_top = 234.0
+margin_right = 460.0
+margin_bottom = 254.0
+text = "source"
 
 [node name="OutlineBox2" type="ColorRect" parent="."]
 visible = false

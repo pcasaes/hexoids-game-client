@@ -17,20 +17,20 @@ margin_bottom = 27.0
 [node name="Destroyer" type="Label" parent="."]
 margin_left = 4.0
 margin_top = 13.0
-margin_right = 94.0
+margin_right = 110.0
 margin_bottom = 27.0
-rect_min_size = Vector2( 90, 0 )
+rect_min_size = Vector2( 106, 0 )
 align = 2
 
 [node name="Action" type="Label" parent="."]
-margin_left = 98.0
+margin_left = 114.0
 margin_top = 13.0
-margin_right = 98.0
+margin_right = 114.0
 margin_bottom = 27.0
 text = "—•"
 
 [node name="Destroyee" type="Label" parent="."]
-margin_left = 102.0
+margin_left = 118.0
 margin_top = 13.0
-margin_right = 102.0
+margin_right = 118.0
 margin_bottom = 27.0

@@ -30,25 +30,38 @@ signal bolts_available_command
 # var a = 2
 # var b = "text"
 
+const HOST = 'ws://hexoids.duckdns.org:28080'
+
 var client
 var connected = false;
 var joinTime
 
 var _config
-var _host
+var host setget set_host, get_host
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	_config = ConfigFile.new()
 	var err = _config.load(CONFIG_FILE)
 	if err == OK:
-		_host = _config.get_value("server", "host", "ws://hexoids.duckdns.org:28080")
+		host = _config.get_value("server", "host", HOST)
 	else:
-		_host = "ws://hexoids.duckdns.org:28080"
-		_config.set_value("server", "host", _host)
+		host = HOST
+		_config.set_value("server", "host", host)
 		_config.save(CONFIG_FILE)
-		
 
+func reset_host():
+	set_host(HOST)
+		
+func set_host(h):
+	if h != host:
+		host = h
+		_config.set_value("server", "host", host)
+		_config.save(CONFIG_FILE)	
+	
+func get_host():
+	return host
+		
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -64,7 +77,7 @@ func _init():
 
 func start():
 	print("Starting server for user " + User.id)
-	var endpoint = _host + '/game/' + User.id
+	var endpoint = host + '/game/' + User.id
 	var err = client.connect_to_url(endpoint)
 	print("Connection status: " + str(err))
 	

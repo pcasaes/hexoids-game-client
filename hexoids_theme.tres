@@ -1,8 +1,51 @@
-[gd_resource type="Theme" load_steps=6 format=2]
+[gd_resource type="Theme" load_steps=13 format=2]
 
 [ext_resource path="res://fonts/electrolize-moongloss/ElectrolizeMoonGloos.tres" type="DynamicFont" id=1]
+[ext_resource path="res://assets/gui/button-base.png" type="Texture" id=2]
+[ext_resource path="res://assets/gui/button-base-bold.png" type="Texture" id=3]
+[ext_resource path="res://assets/gui/button-base-full.png" type="Texture" id=4]
+
+[sub_resource type="StyleBoxTexture" id=9]
+content_margin_left = 30.0
+content_margin_right = 30.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+texture = ExtResource( 3 )
+region_rect = Rect2( 0, 0, 64, 64 )
+margin_left = 16.0
+margin_right = 16.0
+margin_top = 16.0
+margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id=10]
+content_margin_left = 30.0
+content_margin_right = 30.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+texture = ExtResource( 2 )
+region_rect = Rect2( 0, 0, 64, 64 )
+margin_left = 16.0
+margin_right = 16.0
+margin_top = 16.0
+margin_bottom = 16.0
+modulate_color = Color( 1, 1, 1, 0.894118 )
+
+[sub_resource type="StyleBoxTexture" id=11]
+content_margin_left = 30.0
+content_margin_right = 30.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+texture = ExtResource( 4 )
+region_rect = Rect2( 0, 0, 64, 64 )
+margin_left = 16.0
+margin_right = 16.0
+margin_top = 16.0
+margin_bottom = 16.0
 
 [sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.00784314, 0.109804, 0.129412, 1 )
+
+[sub_resource type="StyleBoxFlat" id=5]
 bg_color = Color( 0.00784314, 0.109804, 0.129412, 1 )
 
 [sub_resource type="StyleBoxFlat" id=2]
@@ -16,10 +59,6 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.14902, 0.854902, 0.992157, 1 )
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxEmpty" id=3]
 
@@ -30,26 +69,39 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.14902, 0.854902, 0.992157, 1 )
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [resource]
 default_font = ExtResource( 1 )
+Button/colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
+Button/colors/font_color_disabled = Color( 0.9, 0.9, 0.9, 0.2 )
+Button/colors/font_color_hover = Color( 0.14902, 0.854902, 0.992157, 1 )
+Button/colors/font_color_pressed = Color( 0.14902, 0.854902, 0.992157, 1 )
+Button/constants/hseparation = 2
+Button/fonts/font = null
+Button/styles/disabled = null
+Button/styles/focus = SubResource( 9 )
+Button/styles/hover = SubResource( 9 )
+Button/styles/normal = SubResource( 10 )
+Button/styles/pressed = SubResource( 11 )
 LineEdit/colors/clear_button_color = Color( 0.878431, 0.878431, 0.878431, 1 )
 LineEdit/colors/clear_button_color_pressed = Color( 1, 1, 1, 1 )
 LineEdit/colors/cursor_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 LineEdit/colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
-LineEdit/colors/font_color_selected = Color( 0, 0, 0, 1 )
+LineEdit/colors/font_color_selected = Color( 0.00784314, 0.109804, 0.129412, 1 )
 LineEdit/colors/font_color_uneditable = Color( 0.88, 0.88, 0.88, 0.5 )
-LineEdit/colors/selection_color = Color( 0.490196, 0.490196, 0.490196, 1 )
+LineEdit/colors/selection_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 LineEdit/constants/minimum_spaces = 12
 LineEdit/fonts/font = null
 LineEdit/icons/clear = null
 LineEdit/styles/focus = SubResource( 1 )
-LineEdit/styles/normal = null
+LineEdit/styles/normal = SubResource( 5 )
 LineEdit/styles/read_only = null
+LinkButton/colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
+LinkButton/colors/font_color_hover = Color( 0.151329, 0.861844, 1, 1 )
+LinkButton/colors/font_color_pressed = Color( 0.14902, 0.854902, 0.992157, 1 )
+LinkButton/constants/underline_spacing = 2
+LinkButton/fonts/font = null
+LinkButton/styles/focus = null
 PanelContainer/styles/panel = SubResource( 2 )
 ProgressBar/colors/font_color = Color( 0.94, 0.94, 0.94, 1 )
 ProgressBar/colors/font_color_shadow = Color( 0, 0, 0, 1 )

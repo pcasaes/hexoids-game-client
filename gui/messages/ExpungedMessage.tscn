@@ -12,18 +12,10 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
-margin_left = 505.0
-margin_top = 293.0
-margin_right = 519.0
-margin_bottom = 307.0
+[node name="Start" type="Button" parent="."]
+margin_left = 482.0
+margin_top = 280.0
+margin_right = 542.0
+margin_bottom = 320.0
 theme = ExtResource( 2 )
-
-[node name="Label" type="Label" parent="PanelContainer"]
-margin_left = -108.0
-margin_top = -9.0
-margin_right = 121.0
-margin_bottom = 22.0
-custom_colors/font_color = Color( 1, 0.533333, 0, 1 )
-text = "You have been booted for inactivity.
-Press SPACEBAR to re-join."
+text = "You have been booted for inactivity.Press SPACEBAR to re-join"

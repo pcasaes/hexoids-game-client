@@ -107,7 +107,7 @@ animations = [ {
 "speed": 5.0
 } ]
 
-[sub_resource type="SpriteFrames" id=26]
+[sub_resource type="SpriteFrames" id=16]
 animations = [ {
 "frames": [ ExtResource( 1 ) ],
 "loop": true,
@@ -136,4 +136,4 @@ frames = SubResource( 15 )
 modulate = Color( 1, 1, 1, 0.501961 )
 scale = Vector2( 0.3, 0.3 )
 z_index = 2
-frames = SubResource( 26 )
+frames = SubResource( 16 )

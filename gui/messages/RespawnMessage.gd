@@ -15,7 +15,8 @@ func _ready():
 	Server.connect('player_destroyed', self, '_on_player_destroyed')
 	Server.connect('player_left', self, '_on_player_left')
 	Server.connect('server_disconnected', self, '_on_server_disconnected')
-
+	$Start.connect('pressed', self, '_start')
+	
 func _on_player_spawned(ev, _dto):
 	if store.getMyPlayerId() == ev.get_location().get_playerId().get_guid():
 		self.visible = false
@@ -30,13 +31,13 @@ func _on_server_disconnected():
 func _on_player_destroyed(ev, _dto):
 	if store.getMyPlayerId() == ev.get_playerId().get_guid():
 		self.visible = true
+		$Start.grab_focus()
 	
-func _input(event):
-	if self.visible and event.is_action_pressed("ui_respawn"):
+func _start():
 		var request = HexoidsProto.RequestCommand.new()
-		request.new_spawn()		
-		
+		request.new_spawn()				
 		Server.sendMessage(request)
+			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass

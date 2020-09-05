@@ -12,6 +12,7 @@ func _ready():
 	Server.connect('player_left', self, '_on_player_left')
 	Server.connect('server_disconnected', self, '_on_server_disconnected')
 	Server.connect('server_connected', self, '_on_server_connected')
+	$Start.connect('pressed', self, '_start')
 
 func _on_player_left(ev, _dto):
 	if User.is_user_from_guid(ev.get_playerId()):
@@ -27,9 +28,8 @@ func _on_player_destroyed(ev, _dto):
 	if User.is_user_from_guid(ev.get_playerId()):
 		self.visible = true
 	
-func _input(event):
-	if self.visible and event.is_action_pressed("ui_respawn"):
-		Server.start()
+func _start():
+	Server.start()		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
