@@ -12,6 +12,9 @@ var _next = null
 var _from
 var _to
 
+var _wait_to_start_time = 0
+var done_waiting = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	Server.connect("server_connected", self, '_on_server_connected')
@@ -57,6 +60,12 @@ func _show(v):
 				_from.visible = false
 
 func _physics_process(delta):
+	if not done_waiting:
+		_wait_to_start_time = _wait_to_start_time + delta
+		if _wait_to_start_time > 2:
+			Server.request_clients_available()
+			done_waiting = true
+		
 	if _fade:
 		if _from.modulate.a > 0:
 			_from.modulate.a = max(0,_from.modulate.a - delta)

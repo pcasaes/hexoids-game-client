@@ -15,6 +15,7 @@ const MID_MAX_DISTANCE_SQUARED = pow(2000, 2)
 
 var cameraStore = CameraStore.store
 
+var enabled = true setget set_enabled,get_enabled
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -24,6 +25,15 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func set_enabled(v):
+	if v != enabled:
+		enabled = v
+		for c in get_children():
+			c.enabled = v
+
+func get_enabled():
+	return enabled
 
 func _play(s, x, y, priority):
 	var distSquared
@@ -59,3 +69,8 @@ func _play(s, x, y, priority):
 			s.set_bus("BACK")
 			
 		s.play(0)
+
+
+func _input(event):
+	if event.is_action_pressed("ui_toggle_mute"):
+		set_enabled(not enabled)

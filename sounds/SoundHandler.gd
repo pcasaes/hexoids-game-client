@@ -24,6 +24,8 @@ var priorityNext = 0
 var regularPlaying = 0
 var priorityPlaying = 0
 
+var enabled = true
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	for _i in range(MAX_POOL_SIZE):
@@ -42,13 +44,13 @@ func _ready():
 		add_child(p)
 
 func play_in_model(priority, model_x, model_y):
-	if (priority or sinceLastPlayer > 0.1):
+	if (enabled and (priority or sinceLastPlayer > 0.1)):
 		var x = HexoidsConfig.world.xToView(model_x)
 		var y = HexoidsConfig.world.yToView(model_y)
 		_play(x, y, priority)
 		
 func play_in_view(priority, x, y):
-	if (priority or sinceLastPlayer > 0.1):
+	if (enabled and (priority or sinceLastPlayer > 0.1)):
 		_play(x, y, priority)
 			
 func _play(x, y, priority):

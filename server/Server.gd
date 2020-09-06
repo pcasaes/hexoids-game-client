@@ -79,7 +79,6 @@ func _ready():
 	clientsAvailableRequest = HTTPRequest.new()
 	add_child(clientsAvailableRequest)
 	clientsAvailableRequest.connect("request_completed", self, "_on_client_available_request_completed")
-	request_clients_available()
 	
 func open_download_page():
 	if expectedClientVersion == null:
