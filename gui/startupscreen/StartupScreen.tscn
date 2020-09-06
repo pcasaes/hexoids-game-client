@@ -76,7 +76,7 @@ script = ExtResource( 5 )
 
 [node name="Animation" type="AnimatedSprite" parent="Loading"]
 frames = SubResource( 9 )
-frame = 1
+frame = 6
 playing = true
 
 [node name="StartScreen" type="PanelContainer" parent="."]
