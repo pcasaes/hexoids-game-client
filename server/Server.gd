@@ -2,10 +2,11 @@ extends Node
 
 const HexoidsProto = preload("res://server/HexoidsProto.gd")
 const CONFIG_FILE = "user://server.cfg"
-
+const CLIENT_VERSION = '0.1.0'
 
 signal server_disconnected
 signal server_connected
+signal server_connecting
 
 # domain events
 signal bolt_exhausted
@@ -26,42 +27,113 @@ signal player_score_update_command
 signal live_bolts_list_command
 signal bolts_available_command
 
+# client check
+signal checking_client
+signal client_check_failed
+signal client_supported
+signal client_version
+
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
 
-const HOST = 'ws://hexoids.duckdns.org:28080'
 
 var client
 var connected = false;
 var joinTime
 
 var _config
+
+var _HOST = 'ws://hexoids.duckdns.org:28080'
+
 var host setget set_host, get_host
+
+var clientVersion = Classes.SymVer.new(CLIENT_VERSION)
+var expectedClientVersion
+
+var clientsAvailableRequest
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print("Client platform: " + OS.get_name())
 	_config = ConfigFile.new()
-	var err = _config.load(CONFIG_FILE)
-	if err == OK:
-		host = _config.get_value("server", "host", HOST)
+	
+	if can_change_host():
+		var err = _config.load(CONFIG_FILE)
+		if err == OK:
+			host = _config.get_value("server", "host", _HOST)
+		else:
+			host = _HOST
+			_config.set_value("server", "host", host)
+			_config.save(CONFIG_FILE)
 	else:
-		host = HOST
-		_config.set_value("server", "host", host)
-		_config.save(CONFIG_FILE)
-
+		var location_host = JavaScript.eval("location.host", true)
+		var location_protocol = JavaScript.eval("location.protocol", true)
+		_HOST = 'ws'
+		if location_protocol.to_lower() == 'https:':
+			_HOST = _HOST + 's'
+		_HOST = _HOST + '://' + location_host
+			
+		host = _HOST
+		
+	clientsAvailableRequest = HTTPRequest.new()
+	add_child(clientsAvailableRequest)
+	clientsAvailableRequest.connect("request_completed", self, "_on_client_available_request_completed")
+	request_clients_available()
+	
+func open_download_page():
+	if expectedClientVersion == null:
+		OS.shell_open('https://github.com/pcasaes/hexoids-game-client/releases')
+	else:
+		OS.shell_open('https://github.com/pcasaes/hexoids-game-client/releases/tag/'+expectedClientVersion)
+		
 func reset_host():
-	set_host(HOST)
+	if can_change_host():
+		request_clients_available(_HOST)
+	
+func can_change_host():
+	return OS.get_name() != 'HTML5' or JavaScript.eval('location.host', true).find('localhost') == 0
 		
 func set_host(h):
 	if h != host:
 		host = h
 		_config.set_value("server", "host", host)
-		_config.save(CONFIG_FILE)	
+		_config.save(CONFIG_FILE)
 	
 func get_host():
 	return host
+	
+func request_clients_available(h = null):
+	if h != null:
+		set_host(h)
+	
+	var req = 'http'+host.substr(2) + '/clients/available.json'
+	print("Requesting clients available from: " + req)
+	emit_signal('checking_client')
+	clientsAvailableRequest.request(req)
 		
+
+func _on_client_available_request_completed(result, response_code, headers, body):
+	if response_code == 200:
+		var json = JSON.parse(body.get_string_from_utf8())
+		print(json.result)
+		expectedClientVersion = json.result[OS.get_name()]
+		emit_signal("client_version", expectedClientVersion)
+		var ver = Classes.SymVer.new(expectedClientVersion)
+		if clientVersion.greaterThanOrEqualTo(ver):
+			print("client version ok")
+			emit_signal('client_supported', true)
+		else:
+			print("client version old")
+			emit_signal('client_supported', false)
+	else:
+		print("Response code: " + str(response_code))
+		if body != null:
+			print("Body: " + body.get_string_from_utf8())
+		else:
+			print("No body")
+		emit_signal('client_check_failed')
+			
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -76,6 +148,7 @@ func _init():
 	client.connect("data_received", self, "_on_received")
 
 func start():
+	emit_signal("server_connecting")
 	print("Starting server for user " + User.id)
 	var endpoint = host + '/game/' + User.id
 	var err = client.connect_to_url(endpoint)

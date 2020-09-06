@@ -1,7 +1,60 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://hexoids_theme.tres" type="Theme" id=1]
 [ext_resource path="res://gui/startupscreen/StartupScreen.gd" type="Script" id=2]
+[ext_resource path="res://gui/startupscreen/StartScreen.gd" type="Script" id=3]
+[ext_resource path="res://assets/gui/loading-Sheet.png" type="Texture" id=4]
+[ext_resource path="res://gui/startupscreen/Loading.gd" type="Script" id=5]
+[ext_resource path="res://gui/startupscreen/CheckClientScreen.gd" type="Script" id=6]
+[ext_resource path="res://gui/startupscreen/ClientCheckFailedScreen.gd" type="Script" id=7]
+
+[sub_resource type="AtlasTexture" id=1]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 0, 0, 128, 128 )
+
+[sub_resource type="AtlasTexture" id=2]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 128, 0, 128, 128 )
+
+[sub_resource type="AtlasTexture" id=3]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 256, 0, 128, 128 )
+
+[sub_resource type="AtlasTexture" id=4]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 384, 0, 128, 128 )
+
+[sub_resource type="AtlasTexture" id=5]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 512, 0, 128, 128 )
+
+[sub_resource type="AtlasTexture" id=6]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 640, 0, 128, 128 )
+
+[sub_resource type="AtlasTexture" id=7]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 768, 0, 128, 128 )
+
+[sub_resource type="AtlasTexture" id=8]
+flags = 4
+atlas = ExtResource( 4 )
+region = Rect2( 896, 0, 128, 128 )
+
+[sub_resource type="SpriteFrames" id=9]
+animations = [ {
+"frames": [ SubResource( 1 ), SubResource( 1 ), SubResource( 2 ), SubResource( 2 ), SubResource( 3 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ) ],
+"loop": true,
+"name": "default",
+"speed": 24.0
+} ]
 
 [node name="StartupScreen" type="CenterContainer"]
 anchor_right = 1.0
@@ -12,17 +65,33 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="OutlineBox" type="PanelContainer" parent="."]
-margin_left = 242.0
-margin_top = 153.0
-margin_right = 782.0
-margin_bottom = 447.0
+[node name="Loading" type="Control" parent="."]
+margin_left = 512.0
+margin_top = 300.0
+margin_right = 512.0
+margin_bottom = 300.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 5 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="OutlineBox"]
+[node name="Animation" type="AnimatedSprite" parent="Loading"]
+frames = SubResource( 9 )
+frame = 1
+playing = true
+
+[node name="StartScreen" type="PanelContainer" parent="."]
+visible = false
+margin_left = 472.0
+margin_top = 280.0
+margin_right = 552.0
+margin_bottom = 320.0
+script = ExtResource( 3 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="StartScreen"]
 margin_left = 40.0
 margin_top = 20.0
 margin_right = 500.0
-margin_bottom = 274.0
+margin_bottom = 276.0
 grow_vertical = 2
 custom_constants/separation = 6
 alignment = 1
@@ -30,19 +99,19 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="GridContainer" type="GridContainer" parent="OutlineBox/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="StartScreen/VBoxContainer"]
 margin_right = 460.0
-margin_bottom = 64.0
+margin_bottom = 40.0
 columns = 2
 
-[node name="NameLabel" type="Label" parent="OutlineBox/VBoxContainer/GridContainer"]
+[node name="NameLabel" type="Label" parent="StartScreen/VBoxContainer/GridContainer"]
 margin_right = 86.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 86, 0 )
 custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 text = "Name"
 
-[node name="NameEdit" type="LineEdit" parent="OutlineBox/VBoxContainer/GridContainer"]
+[node name="NameEdit" type="LineEdit" parent="StartScreen/VBoxContainer/GridContainer"]
 margin_left = 90.0
 margin_right = 460.0
 margin_bottom = 20.0
@@ -50,7 +119,8 @@ rect_min_size = Vector2( 370, 0 )
 max_length = 8
 caret_blink = true
 
-[node name="ServerLabel" type="Label" parent="OutlineBox/VBoxContainer/GridContainer"]
+[node name="ServerLabel" type="Label" parent="StartScreen/VBoxContainer/GridContainer"]
+visible = false
 margin_top = 24.0
 margin_right = 86.0
 margin_bottom = 44.0
@@ -58,41 +128,42 @@ rect_min_size = Vector2( 86, 0 )
 custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 text = "Server"
 
-[node name="ServerEdit" type="LineEdit" parent="OutlineBox/VBoxContainer/GridContainer"]
+[node name="ServerEdit" type="LineEdit" parent="StartScreen/VBoxContainer/GridContainer"]
+visible = false
 margin_left = 90.0
 margin_top = 24.0
 margin_right = 460.0
 margin_bottom = 44.0
 
-[node name="separator" type="Control" parent="OutlineBox/VBoxContainer/GridContainer"]
-margin_top = 48.0
+[node name="separator" type="Control" parent="StartScreen/VBoxContainer/GridContainer"]
+margin_top = 24.0
 margin_right = 86.0
-margin_bottom = 64.0
+margin_bottom = 40.0
 rect_min_size = Vector2( 0, 16 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="OutlineBox/VBoxContainer"]
-margin_top = 70.0
+[node name="HBoxContainer" type="HBoxContainer" parent="StartScreen/VBoxContainer"]
+margin_top = 46.0
 margin_right = 460.0
-margin_bottom = 110.0
+margin_bottom = 86.0
 custom_constants/separation = 32
 alignment = 1
 
-[node name="Start" type="Button" parent="OutlineBox/VBoxContainer/HBoxContainer"]
+[node name="Start" type="Button" parent="StartScreen/VBoxContainer/HBoxContainer"]
 margin_left = 96.0
 margin_right = 214.0
 margin_bottom = 40.0
 text = "START"
 
-[node name="Reset" type="Button" parent="OutlineBox/VBoxContainer/HBoxContainer"]
+[node name="Reset" type="Button" parent="StartScreen/VBoxContainer/HBoxContainer"]
 margin_left = 246.0
 margin_right = 364.0
 margin_bottom = 40.0
 text = "RESET"
 
-[node name="Label" type="Label" parent="OutlineBox/VBoxContainer"]
-margin_top = 116.0
+[node name="Label" type="Label" parent="StartScreen/VBoxContainer"]
+margin_top = 92.0
 margin_right = 460.0
-margin_bottom = 228.0
+margin_bottom = 204.0
 custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
 text = "
 Trackpad/Mouse for movements.
@@ -100,17 +171,115 @@ C to fire.
 Z pressed to lock direction.
 X pressed to lock position."
 
-[node name="LinkButton" type="LinkButton" parent="OutlineBox/VBoxContainer"]
-margin_top = 234.0
+[node name="DownloadLink" type="LinkButton" parent="StartScreen/VBoxContainer"]
+margin_top = 210.0
 margin_right = 460.0
-margin_bottom = 254.0
+margin_bottom = 230.0
+text = "Download Native Client"
+
+[node name="SourceLink" type="LinkButton" parent="StartScreen/VBoxContainer"]
+margin_top = 236.0
+margin_right = 460.0
+margin_bottom = 256.0
 text = "source"
 
-[node name="OutlineBox2" type="ColorRect" parent="."]
+[node name="CheckClientScreen" type="PanelContainer" parent="."]
 visible = false
-margin_left = 269.0
-margin_top = 195.0
-margin_right = 755.0
-margin_bottom = 404.0
-rect_min_size = Vector2( 486, 209 )
-color = Color( 0.0156863, 0.137255, 0.160784, 0.65098 )
+margin_left = 472.0
+margin_top = 280.0
+margin_right = 552.0
+margin_bottom = 320.0
+script = ExtResource( 6 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CheckClientScreen"]
+margin_left = 40.0
+margin_top = 20.0
+margin_right = 350.0
+margin_bottom = 40.0
+custom_constants/separation = 6
+
+[node name="Label" type="Label" parent="CheckClientScreen/VBoxContainer"]
+modulate = Color( 0.14902, 0.854902, 0.992157, 1 )
+margin_right = 310.0
+margin_bottom = 20.0
+text = "Please upgrade your client"
+
+[node name="LinkButton" type="LinkButton" parent="CheckClientScreen/VBoxContainer"]
+margin_top = 24.0
+margin_right = 310.0
+margin_bottom = 44.0
+text = "Download"
+
+[node name="ClientCheckFailedScreen" type="PanelContainer" parent="."]
+visible = false
+margin_left = 472.0
+margin_top = 280.0
+margin_right = 552.0
+margin_bottom = 320.0
+script = ExtResource( 7 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ClientCheckFailedScreen"]
+margin_left = 40.0
+margin_top = 20.0
+margin_right = 412.0
+margin_bottom = 177.0
+custom_constants/separation = 6
+
+[node name="Label" type="Label" parent="ClientCheckFailedScreen/VBoxContainer"]
+margin_right = 372.0
+margin_bottom = 43.0
+custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
+text = "Could not connect at this time.
+Try again or change servers"
+
+[node name="separator" type="Control" parent="ClientCheckFailedScreen/VBoxContainer"]
+margin_top = 49.0
+margin_right = 372.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 0, 16 )
+
+[node name="GridContainer" type="GridContainer" parent="ClientCheckFailedScreen/VBoxContainer"]
+visible = false
+margin_top = 71.0
+margin_right = 372.0
+margin_bottom = 111.0
+columns = 2
+
+[node name="ServerLabel" type="Label" parent="ClientCheckFailedScreen/VBoxContainer/GridContainer"]
+margin_right = 86.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 86, 0 )
+custom_colors/font_color = Color( 0.14902, 0.854902, 0.992157, 1 )
+text = "Server"
+
+[node name="ServerEdit" type="LineEdit" parent="ClientCheckFailedScreen/VBoxContainer/GridContainer"]
+margin_left = 90.0
+margin_right = 234.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 370, 0 )
+
+[node name="separator" type="Control" parent="ClientCheckFailedScreen/VBoxContainer/GridContainer"]
+margin_top = 24.0
+margin_right = 86.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 16 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ClientCheckFailedScreen/VBoxContainer"]
+margin_top = 117.0
+margin_right = 372.0
+margin_bottom = 157.0
+custom_constants/separation = 32
+alignment = 1
+
+[node name="TryAgain" type="Button" parent="ClientCheckFailedScreen/VBoxContainer/HBoxContainer"]
+margin_left = 28.0
+margin_right = 194.0
+margin_bottom = 40.0
+text = "TRY AGAIN"
+
+[node name="Reset" type="Button" parent="ClientCheckFailedScreen/VBoxContainer/HBoxContainer"]
+visible = false
+margin_left = 226.0
+margin_right = 344.0
+margin_bottom = 40.0
+text = "RESET"
