@@ -106,7 +106,7 @@ func request_clients_available(h = null):
 	if h != null:
 		set_host(h)
 	
-	var req = 'http'+host.substr(2) + '/clients/available'
+	var req = 'http' + host.substr(2) + '/clients/available'
 	print("Requesting clients available from: " + req)
 	emit_signal('checking_client')
 	clientsAvailableRequest.request(req)

@@ -15,16 +15,22 @@ var _to
 var _wait_to_start_time = 0
 var done_waiting = false
 
+var _connected = false
+var _connected_wait = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Server.connect("server_connected", self, '_on_server_connected')
 	Server.connect("server_connecting", self, '_on_server_connecting')
 	Server.connect("client_supported", self, '_on_client_supported')
 	Server.connect("client_check_failed", self, '_on_client_check_failed')
+	Server.connect("checking_client", self, '_on_server_connecting')
+	Server.connect('player_moved', self, '_on_player_action')
+	Server.connect('player_destroyed', self, '_on_player_action')
 	
-func _on_server_connected():
-	self.visible = false
-	queue_free()
+func _on_player_action(ev, _dto):
+	var guid = ev.get_playerId().get_guid()
+	if guid == User.id:
+		_connected = true
 
 func _on_client_supported(v):
 	if v:
@@ -58,8 +64,20 @@ func _show(v):
 			if _from == $Loading:
 				_from.modulate.a = 0
 				_from.visible = false
+			else:
+				$TransitionSound.play()
 
 func _physics_process(delta):
+	if _connected:
+		_connected_wait = _connected_wait + delta
+		if _connected_wait > 0.3:
+			$Loading.fade_out()
+			modulate.a = max(0,modulate.a - delta)
+			if modulate.a == 0:
+				self.visible = false
+				queue_free()
+			
+		
 	if not done_waiting:
 		_wait_to_start_time = _wait_to_start_time + delta
 		if _wait_to_start_time > 2:
