@@ -860,6 +860,14 @@ class PlayerDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+enum ClientPlatforms {
+	UNKNOWN = 0,
+	HTML5 = 1,
+	OSX = 2,
+	WINDOWS = 3,
+	X11 = 4
+}
+
 class BoltExhaustedEventDto:
 	func _init():
 		var service
@@ -1142,6 +1150,11 @@ class PlayerJoinedEventDto:
 		service.field = _name
 		data[_name.tag] = service
 		
+		_clientPlatform = PBField.new("clientPlatform", PB_DATA_TYPE.ENUM, PB_RULE.OPTIONAL, 4, true, DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM])
+		service = PBServiceField.new()
+		service.field = _clientPlatform
+		data[_clientPlatform.tag] = service
+		
 	var data = {}
 	
 	var _playerId: PBField
@@ -1168,6 +1181,14 @@ class PlayerJoinedEventDto:
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
 	func set_name(value : String) -> void:
 		_name.value = value
+	
+	var _clientPlatform: PBField
+	func get_clientPlatform():
+		return _clientPlatform.value
+	func clear_clientPlatform() -> void:
+		_clientPlatform.value = DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM]
+	func set_clientPlatform(value) -> void:
+		_clientPlatform.value = value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
@@ -2135,6 +2156,11 @@ class JoinCommandDto:
 		service.field = _name
 		data[_name.tag] = service
 		
+		_clientPlatform = PBField.new("clientPlatform", PB_DATA_TYPE.ENUM, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM])
+		service = PBServiceField.new()
+		service.field = _clientPlatform
+		data[_clientPlatform.tag] = service
+		
 	var data = {}
 	
 	var _name: PBField
@@ -2144,6 +2170,14 @@ class JoinCommandDto:
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
 	func set_name(value : String) -> void:
 		_name.value = value
+	
+	var _clientPlatform: PBField
+	func get_clientPlatform():
+		return _clientPlatform.value
+	func clear_clientPlatform() -> void:
+		_clientPlatform.value = DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM]
+	func set_clientPlatform(value) -> void:
+		_clientPlatform.value = value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)

@@ -24,6 +24,14 @@ message PlayerDto {
     string name = 7;
 }
 
+enum ClientPlatforms {
+    UNKNOWN = 0;
+    HTML5 = 1;
+    OSX = 2;
+    WINDOWS = 3;
+    X11 = 4;
+}
+
 // events
 
 message BoltExhaustedEventDto {
@@ -52,6 +60,7 @@ message PlayerJoinedEventDto {
     GUID playerId = 1;
     int32 ship = 2;
     string name = 3;
+    ClientPlatforms clientPlatform = 4;
 }
 
 message PlayerLeftEventDto {
@@ -131,6 +140,7 @@ message SpawnCommandDto {
 
 message JoinCommandDto {
     string name = 1;
+    ClientPlatforms clientPlatform = 2;
 }
 
 message RequestCommand {

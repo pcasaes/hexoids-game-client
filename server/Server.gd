@@ -159,7 +159,19 @@ func _on_opened(_protocol):
 	print("connected to host")
 	joinTime = HClock.clock.clientTime()
 	var request = HexoidsProto.RequestCommand.new()
-	request.new_join().set_name(User.username)
+	
+	var cp = OS.get_name().to_upper()
+	var clientPlatform = HexoidsProto.ClientPlatforms.UNKNOWN
+	
+	for k in HexoidsProto.ClientPlatforms.keys():
+		if k == cp:
+			clientPlatform = HexoidsProto.ClientPlatforms[k]
+			break
+
+	print("Client Platform: " + HexoidsProto.ClientPlatforms.keys()[clientPlatform])
+	var joinCommand = request.new_join()
+	joinCommand.set_name(User.username)
+	joinCommand.set_clientPlatform(clientPlatform)
 	
 	sendMessage(request)
 	emit_signal("server_connected")
