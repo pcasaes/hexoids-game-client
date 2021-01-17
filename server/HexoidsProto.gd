@@ -860,6 +860,72 @@ class PlayerDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+class BarrierDto:
+	func _init():
+		var service
+		
+		_x = PBField.new("x", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _x
+		data[_x.tag] = service
+		
+		_y = PBField.new("y", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _y
+		data[_y.tag] = service
+		
+		_angle = PBField.new("angle", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _angle
+		data[_angle.tag] = service
+		
+	var data = {}
+	
+	var _x: PBField
+	func get_x() -> float:
+		return _x.value
+	func clear_x() -> void:
+		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_x(value : float) -> void:
+		_x.value = value
+	
+	var _y: PBField
+	func get_y() -> float:
+		return _y.value
+	func clear_y() -> void:
+		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_y(value : float) -> void:
+		_y.value = value
+	
+	var _angle: PBField
+	func get_angle() -> float:
+		return _angle.value
+	func clear_angle() -> void:
+		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_angle(value : float) -> void:
+		_angle.value = value
+	
+	func to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PoolByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
 enum ClientPlatforms {
 	UNKNOWN = 0,
 	HTML5 = 1,
@@ -2315,7 +2381,7 @@ class RequestCommand:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
-class PlayersListCommandDto:
+class CurrentViewCommandDto:
 	func _init():
 		var service
 		
@@ -2330,6 +2396,12 @@ class PlayersListCommandDto:
 		service.field = _boltsAvailable
 		service.func_ref = funcref(self, "new_boltsAvailable")
 		data[_boltsAvailable.tag] = service
+		
+		_barriers = PBField.new("barriers", PB_DATA_TYPE.MESSAGE, PB_RULE.REPEATED, 3, true, [])
+		service = PBServiceField.new()
+		service.field = _barriers
+		service.func_ref = funcref(self, "add_barriers")
+		data[_barriers.tag] = service
 		
 	var data = {}
 	
@@ -2351,6 +2423,16 @@ class PlayersListCommandDto:
 	func new_boltsAvailable() -> BoltsAvailableCommandDto:
 		_boltsAvailable.value = BoltsAvailableCommandDto.new()
 		return _boltsAvailable.value
+	
+	var _barriers: PBField
+	func get_barriers() -> Array:
+		return _barriers.value
+	func clear_barriers() -> void:
+		_barriers.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func add_barriers() -> BarrierDto:
+		var element = BarrierDto.new()
+		_barriers.value.append(element)
+		return element
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
@@ -2506,11 +2588,11 @@ class DirectedCommand:
 		service.func_ref = funcref(self, "new_playerId")
 		data[_playerId.tag] = service
 		
-		_playersList = PBField.new("playersList", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		_currentView = PBField.new("currentView", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
 		service = PBServiceField.new()
-		service.field = _playersList
-		service.func_ref = funcref(self, "new_playersList")
-		data[_playersList.tag] = service
+		service.field = _currentView
+		service.func_ref = funcref(self, "new_currentView")
+		data[_currentView.tag] = service
 		
 		_playerScoreUpdate = PBField.new("playerScoreUpdate", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
 		service = PBServiceField.new()
@@ -2541,21 +2623,21 @@ class DirectedCommand:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _playersList: PBField
-	func has_playersList() -> bool:
+	var _currentView: PBField
+	func has_currentView() -> bool:
 		if data[2].state == PB_SERVICE_STATE.FILLED:
 			return true
 		return false
-	func get_playersList() -> PlayersListCommandDto:
-		return _playersList.value
-	func clear_playersList() -> void:
-		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_playersList() -> PlayersListCommandDto:
+	func get_currentView() -> CurrentViewCommandDto:
+		return _currentView.value
+	func clear_currentView() -> void:
+		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_currentView() -> CurrentViewCommandDto:
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-		_playersList.value = PlayersListCommandDto.new()
-		return _playersList.value
+		_currentView.value = CurrentViewCommandDto.new()
+		return _currentView.value
 	
 	var _playerScoreUpdate: PBField
 	func has_playerScoreUpdate() -> bool:
@@ -2567,7 +2649,7 @@ class DirectedCommand:
 	func clear_playerScoreUpdate() -> void:
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerScoreUpdate() -> PlayerScoreUpdateCommandDto:
-		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerScoreUpdate.value = PlayerScoreUpdateCommandDto.new()
@@ -2583,7 +2665,7 @@ class DirectedCommand:
 	func clear_liveBoltsList() -> void:
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_liveBoltsList() -> LiveBoltListCommandDto:
-		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = LiveBoltListCommandDto.new()
@@ -2599,7 +2681,7 @@ class DirectedCommand:
 	func clear_boltsAvailable() -> void:
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_boltsAvailable() -> BoltsAvailableCommandDto:
-		_playersList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		_boltsAvailable.value = BoltsAvailableCommandDto.new()

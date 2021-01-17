@@ -7,7 +7,7 @@ extends VBoxContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Server.connect('players_list_command', self, '_on_players_list_command')
+	Server.connect('current_view_command', self, '_on_current_view_command')
 	Server.connect('bolts_available_command', self, '_on_bolts_available_command')
 	PlayersStore.store.connect('player_created', self, '_player_created')
 
@@ -21,7 +21,7 @@ func _player_created(ship, _child):
 	style.bg_color = ship.color
 	
 	
-func _on_players_list_command(ev, _dto):
+func _on_current_view_command(ev, _dto):
 	$PanelContainer/ProgressBar.max_value = ev.get_boltsAvailable().get_available()
 
 func _on_bolts_available_command(ev, _dto):

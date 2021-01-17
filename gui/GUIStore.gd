@@ -30,7 +30,7 @@ class GUIStore:
 	func _init():
 		Server.connect('player_joined', self, '_on_player_joined')
 		Server.connect('player_left', self, '_on_player_left')
-		Server.connect('players_list_command', self, '_on_players_list_command')
+		Server.connect('current_view_command', self, '_on_current_view_command')
 		Server.connect('server_disconnected', self, '_on_server_disconnected')
 
 	
@@ -43,7 +43,7 @@ class GUIStore:
 	func _on_player_joined(ev, _dto):
 		addPlayer(ev)
 	
-	func _on_players_list_command(cmd, dto):
+	func _on_current_view_command(cmd, dto):
 		myPlayerId = dto.get_directedCommand().get_playerId().get_guid()
 		for r in cmd.get_players():
 			addPlayer(r)

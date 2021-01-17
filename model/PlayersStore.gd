@@ -18,7 +18,7 @@ func _ready():
 	Server.connect('player_moved', self, '_on_player_moved')
 	Server.connect('player_spawned', self, '_on_player_spawned')
 	Server.connect('player_destroyed', self, '_on_player_destroyed')
-	Server.connect('players_list_command', self, '_on_players_list_command')
+	Server.connect('current_view_command', self, '_on_current_view_command')
 	Server.connect('server_disconnected', self, '_on_server_disconnected')
 
 
@@ -80,7 +80,7 @@ func _on_player_spawned(ev, _dto):
 func _on_player_moved(ev, _dto):
 	_moved(ev)
 		
-func _on_players_list_command(cmd, _dto):
+func _on_current_view_command(cmd, _dto):
 	for r in cmd.get_players():
 		_created(r)
 		_moved(r)

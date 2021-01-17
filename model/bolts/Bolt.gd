@@ -35,7 +35,7 @@ func fired(ev):
 	fired_event = ev
 	velX = cos(ev.get_angle())
 	velY = sin(ev.get_angle())
-	endTime = ev.get_startTimestamp() * ev.get_ttl()
+	endTime = ev.get_startTimestamp() + ev.get_ttl()
 	speed = fired_event.get_speed() / 1000.0
 	var ship = PlayersStore.store.get(ev.get_ownerPlayerId().get_guid())
 	if ship != null:
