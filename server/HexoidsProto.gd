@@ -950,6 +950,11 @@ class BoltExhaustedEventDto:
 		service.func_ref = funcref(self, "new_ownerPlayerId")
 		data[_ownerPlayerId.tag] = service
 		
+		_timestamp = PBField.new("timestamp", PB_DATA_TYPE.INT64, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.INT64])
+		service = PBServiceField.new()
+		service.field = _timestamp
+		data[_timestamp.tag] = service
+		
 	var data = {}
 	
 	var _boltId: PBField
@@ -969,6 +974,14 @@ class BoltExhaustedEventDto:
 	func new_ownerPlayerId() -> GUID:
 		_ownerPlayerId.value = GUID.new()
 		return _ownerPlayerId.value
+	
+	var _timestamp: PBField
+	func get_timestamp() -> int:
+		return _timestamp.value
+	func clear_timestamp() -> void:
+		_timestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
+	func set_timestamp(value : int) -> void:
+		_timestamp.value = value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)

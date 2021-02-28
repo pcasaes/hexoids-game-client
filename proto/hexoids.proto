@@ -43,6 +43,7 @@ enum ClientPlatforms {
 message BoltExhaustedEventDto {
     GUID boltId = 1;
     GUID ownerPlayerId = 2;
+    int64 timestamp = 3;
 }
 
 message BoltFiredEventDto {
@@ -206,4 +207,5 @@ message Dto {
         ClockSync clock = 5;
     }
 }
+
 
