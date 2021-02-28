@@ -2,7 +2,7 @@ extends Node
 
 const HexoidsProto = preload("res://server/HexoidsProto.gd")
 const CONFIG_FILE = "user://server.cfg"
-const CLIENT_VERSION = '0.1.0'
+const CLIENT_VERSION = '0.2.0'
 
 signal server_disconnected
 signal server_connected
@@ -22,7 +22,7 @@ signal player_score_updated
 signal score_board_updated
 
 # directed commands
-signal players_list_command
+signal current_view_command
 signal player_score_update_command
 signal live_bolts_list_command
 signal bolts_available_command
@@ -221,9 +221,9 @@ func _on_received():
 			emit_signal("bolts_available_command", command.get_boltsAvailable(), dto)
 		elif (command.has_playerScoreUpdate()):
 			emit_signal("player_score_update_command", command.get_playerScoreUpdate(), dto)
-		elif (command.has_playersList()):
-			emit_signal("players_list_command", command.get_playersList(), dto)
-			emit_signal("bolts_available_command", command.get_playersList().get_boltsAvailable(), dto)
+		elif (command.has_currentView()):
+			emit_signal("current_view_command", command.get_currentView(), dto)
+			emit_signal("bolts_available_command", command.get_currentView().get_boltsAvailable(), dto)
 		elif (command.has_liveBoltsList()):
 			emit_signal("live_bolts_list_command", command.get_liveBoltsList(), dto)
 	elif (dto.has_clock()):
