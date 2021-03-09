@@ -29,7 +29,7 @@ class HClock:
 		#FIXME should return game time
 		return OS.get_system_time_msecs() + offset;
 		
-	func onClockSync(requestTime, s):
-		offset = s.get_time() - (requestTime + (clientTime() - requestTime) / 2);
+	func onClockSync(requestTime, s, received_time):
+		offset = s.get_time() - (requestTime + (received_time - requestTime) / 2);
 		print('Clock: client to server offset = ', offset)
 	  

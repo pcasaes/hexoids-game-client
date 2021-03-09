@@ -110,10 +110,6 @@ ui_toggle_mute={
  ]
 }
 
-[physics]
-
-common/physics_fps=30
-
 [rendering]
 
 quality/driver/driver_name="GLES2"

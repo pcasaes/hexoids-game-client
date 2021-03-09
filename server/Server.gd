@@ -4,6 +4,9 @@ const HexoidsProto = preload("res://server/HexoidsProto.gd")
 const CONFIG_FILE = "user://server.cfg"
 const CLIENT_VERSION = '0.2.1'
 
+const SingleThreadedWorker = preload("res://server/worker/SingleThreadedWorker.gd")
+const MultiThreadedWorker = preload("res://server/worker/MultiThreaded2Worker.gd")
+
 signal server_disconnected
 signal server_connected
 signal server_connecting
@@ -53,10 +56,34 @@ var expectedClientVersion
 
 var clientsAvailableRequest
 
+var deser_worker
+var deser_func
+var event_dto_handler_func
+
+var ser_worker
+var ser_func
+var send_func
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("Client platform: " + OS.get_name())
 	_config = ConfigFile.new()
+	
+	if (_supports_worker_threads()):
+		deser_worker = MultiThreadedWorker.new()
+		ser_worker = MultiThreadedWorker.new()
+	else:
+		deser_worker = SingleThreadedWorker.new()
+		ser_worker = SingleThreadedWorker.new()
+		
+	add_child(deser_worker)
+	add_child(ser_worker)
+	
+	deser_func = funcref(self, "_deserialize")
+	event_dto_handler_func = funcref(self, "_handle_event_dto")
+	ser_func = funcref(self, "_serialize")
+	send_func = funcref(self, "_send_bytes")
+
 	
 	if can_change_host():
 		var err = _config.load(CONFIG_FILE)
@@ -92,7 +119,10 @@ func reset_host():
 	
 func can_change_host():
 	return OS.get_name() != 'HTML5' or JavaScript.eval('location.host', true).find('localhost') == 0
-		
+	
+func _supports_worker_threads():
+	return OS.can_use_threads()
+
 func set_host(h):
 	if h != host:
 		host = h
@@ -186,9 +216,14 @@ func _on_error():
 	
 func _on_received():
 	var packet = client.get_peer(1).get_packet()
+	deser_worker.execute(packet, deser_func, event_dto_handler_func)
+	
+func _deserialize(packet):
 	var dto = HexoidsProto.Dto.new();
 	dto.from_bytes(packet)
-	
+	return dto		
+
+func _handle_event_dto(dto, received_time):	
 	if (dto.has_events()):
 		for event in dto.get_events().get_events():
 			if event.has_boltExhausted():
@@ -227,11 +262,17 @@ func _on_received():
 		elif (command.has_liveBoltsList()):
 			emit_signal("live_bolts_list_command", command.get_liveBoltsList(), dto)
 	elif (dto.has_clock()):
-		HClock.clock.onClockSync(joinTime ,dto.get_clock())
+		HClock.clock.onClockSync(joinTime ,dto.get_clock(), received_time)
 		
 func sendMessage(message):
+	ser_worker.execute(message, ser_func, send_func)
+		
+func _serialize(message):
+	return message.to_bytes()
+	
+func _send_bytes(bytes, _recevied_time):
 	if connected:
-		client.get_peer(1).put_packet(message.to_bytes())
+		client.get_peer(1).put_packet(bytes)
 
 func _physics_process(_delta):
 	if client.get_connection_status() == WebSocketClient.CONNECTION_DISCONNECTED:
