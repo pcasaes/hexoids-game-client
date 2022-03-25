@@ -112,7 +112,7 @@ func request_clients_available(h = null):
 	clientsAvailableRequest.request(req)
 		
 
-func _on_client_available_request_completed(result, response_code, headers, body):
+func _on_client_available_request_completed(_result, response_code, _headers, body):
 	if response_code == 200:
 		var json = JSON.parse(body.get_string_from_utf8())
 		print(json.result)

@@ -28,4 +28,5 @@ script = ExtResource( 1 )
 
 [node name="GUI" parent="CanvasLayer" instance=ExtResource( 5 )]
 margin_bottom = -566.0
+
 [connection signal="main_ready" from="." to="Ships" method="_on_Main_main_ready"]
