@@ -2,7 +2,7 @@ extends Node
 
 const HexoidsProto = preload("res://server/HexoidsProto.gd")
 const CONFIG_FILE = "user://server.cfg"
-const CLIENT_VERSION = '0.2.1'
+const CLIENT_VERSION = '0.3.0'
 
 signal server_disconnected
 signal server_connected
