@@ -36,9 +36,19 @@ func uuidbin():
 	b[8] = (b[8] & 0x3f) | 0x80
 	
 	return b
+	
+func v4Longs(b):
+	var stream = StreamPeerBuffer.new()
+	stream.set_big_endian(true)
+	stream.set_data_array(b)
+	
+	var r = []
+	r.append(stream.get_u64())
+	r.append(stream.get_u64())
+	
+	return r
 
-func v4():
-	var b = uuidbin()
+func v4(b):
 	
 	var low = '%02x%02x%02x%02x' % [b[0], b[1], b[2], b[3]]
 	var mid = '%02x%02x' % [b[4], b[5]]

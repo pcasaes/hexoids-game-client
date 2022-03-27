@@ -179,7 +179,7 @@ class PBPacker:
 				value = 1
 			else:
 				value = 0
-		for i in range(9):
+		for _i in range(9):
 			var b = value & 0x7F
 			value >>= 7
 			if value:
@@ -202,7 +202,7 @@ class PBPacker:
 			spb.put_double(value)
 			bytes = spb.get_data_array()
 		else:
-			for i in range(count):
+			for _i in range(count):
 				bytes.append(value & 0xFF)
 				value >>= 8
 		return bytes
@@ -540,7 +540,7 @@ class PBPacker:
 		keys.sort()
 		for i in keys:
 			if data[i].field.value != null:
-				if typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
+				if data[i].state == PB_SERVICE_STATE.UNFILLED && typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
 					continue
 				elif data[i].field.rule == PB_RULE.REPEATED && data[i].field.value.size() == 0:
 					continue
@@ -565,7 +565,7 @@ class PBPacker:
 	
 	static func tabulate(text : String, nesting : int) -> String:
 		var tab : String = ""
-		for i in range(nesting):
+		for _i in range(nesting):
 			tab += DEBUG_TAB
 		return tab + text
 	
@@ -646,7 +646,7 @@ class PBPacker:
 		keys.sort()
 		for i in keys:
 			if data[i].field.value != null:
-				if typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
+				if data[i].state == PB_SERVICE_STATE.UNFILLED && typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
 					continue
 				elif data[i].field.rule == PB_RULE.REPEATED && data[i].field.value.size() == 0:
 					continue
@@ -675,6 +675,7 @@ class FloatValue:
 	func get_value() -> float:
 		return _value.value
 	func clear_value() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_value.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_value(value : float) -> void:
 		_value.value = value
@@ -704,7 +705,7 @@ class GUID:
 	func _init():
 		var service
 		
-		_guid = PBField.new("guid", PB_DATA_TYPE.STRING, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.STRING])
+		_guid = PBField.new("guid", PB_DATA_TYPE.BYTES, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.BYTES])
 		service = PBServiceField.new()
 		service.field = _guid
 		data[_guid.tag] = service
@@ -712,11 +713,12 @@ class GUID:
 	var data = {}
 	
 	var _guid: PBField
-	func get_guid() -> String:
+	func get_guid() -> PoolByteArray:
 		return _guid.value
 	func clear_guid() -> void:
-		_guid.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
-	func set_guid(value : String) -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		_guid.value = DEFAULT_VALUES_3[PB_DATA_TYPE.BYTES]
+	func set_guid(value : PoolByteArray) -> void:
 		_guid.value = value
 	
 	func to_string() -> String:
@@ -786,6 +788,7 @@ class PlayerDto:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -795,6 +798,7 @@ class PlayerDto:
 	func get_ship() -> int:
 		return _ship.value
 	func clear_ship() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_ship.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
 	func set_ship(value : int) -> void:
 		_ship.value = value
@@ -803,6 +807,7 @@ class PlayerDto:
 	func get_x() -> float:
 		return _x.value
 	func clear_x() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_x(value : float) -> void:
 		_x.value = value
@@ -811,6 +816,7 @@ class PlayerDto:
 	func get_y() -> float:
 		return _y.value
 	func clear_y() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_y(value : float) -> void:
 		_y.value = value
@@ -819,6 +825,7 @@ class PlayerDto:
 	func get_angle() -> float:
 		return _angle.value
 	func clear_angle() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_angle(value : float) -> void:
 		_angle.value = value
@@ -827,6 +834,7 @@ class PlayerDto:
 	func get_spawned() -> bool:
 		return _spawned.value
 	func clear_spawned() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_spawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.BOOL]
 	func set_spawned(value : bool) -> void:
 		_spawned.value = value
@@ -835,6 +843,7 @@ class PlayerDto:
 	func get_name() -> String:
 		return _name.value
 	func clear_name() -> void:
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
 	func set_name(value : String) -> void:
 		_name.value = value
@@ -885,6 +894,7 @@ class BarrierDto:
 	func get_x() -> float:
 		return _x.value
 	func clear_x() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_x(value : float) -> void:
 		_x.value = value
@@ -893,6 +903,7 @@ class BarrierDto:
 	func get_y() -> float:
 		return _y.value
 	func clear_y() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_y(value : float) -> void:
 		_y.value = value
@@ -901,6 +912,7 @@ class BarrierDto:
 	func get_angle() -> float:
 		return _angle.value
 	func clear_angle() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_angle(value : float) -> void:
 		_angle.value = value
@@ -961,6 +973,7 @@ class BoltExhaustedEventDto:
 	func get_boltId() -> GUID:
 		return _boltId.value
 	func clear_boltId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_boltId() -> GUID:
 		_boltId.value = GUID.new()
@@ -970,6 +983,7 @@ class BoltExhaustedEventDto:
 	func get_ownerPlayerId() -> GUID:
 		return _ownerPlayerId.value
 	func clear_ownerPlayerId() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_ownerPlayerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_ownerPlayerId() -> GUID:
 		_ownerPlayerId.value = GUID.new()
@@ -979,6 +993,7 @@ class BoltExhaustedEventDto:
 	func get_timestamp() -> int:
 		return _timestamp.value
 	func clear_timestamp() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_timestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_timestamp(value : int) -> void:
 		_timestamp.value = value
@@ -1056,6 +1071,7 @@ class BoltFiredEventDto:
 	func get_boltId() -> GUID:
 		return _boltId.value
 	func clear_boltId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_boltId() -> GUID:
 		_boltId.value = GUID.new()
@@ -1065,6 +1081,7 @@ class BoltFiredEventDto:
 	func get_ownerPlayerId() -> GUID:
 		return _ownerPlayerId.value
 	func clear_ownerPlayerId() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_ownerPlayerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_ownerPlayerId() -> GUID:
 		_ownerPlayerId.value = GUID.new()
@@ -1074,6 +1091,7 @@ class BoltFiredEventDto:
 	func get_x() -> float:
 		return _x.value
 	func clear_x() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_x(value : float) -> void:
 		_x.value = value
@@ -1082,6 +1100,7 @@ class BoltFiredEventDto:
 	func get_y() -> float:
 		return _y.value
 	func clear_y() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_y(value : float) -> void:
 		_y.value = value
@@ -1090,6 +1109,7 @@ class BoltFiredEventDto:
 	func get_angle() -> float:
 		return _angle.value
 	func clear_angle() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_angle(value : float) -> void:
 		_angle.value = value
@@ -1098,6 +1118,7 @@ class BoltFiredEventDto:
 	func get_startTimestamp() -> int:
 		return _startTimestamp.value
 	func clear_startTimestamp() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_startTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_startTimestamp(value : int) -> void:
 		_startTimestamp.value = value
@@ -1106,6 +1127,7 @@ class BoltFiredEventDto:
 	func get_speed() -> float:
 		return _speed.value
 	func clear_speed() -> void:
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_speed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_speed(value : float) -> void:
 		_speed.value = value
@@ -1114,6 +1136,7 @@ class BoltFiredEventDto:
 	func get_ttl() -> int:
 		return _ttl.value
 	func clear_ttl() -> void:
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_ttl.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
 	func set_ttl(value : int) -> void:
 		_ttl.value = value
@@ -1166,6 +1189,7 @@ class PlayerDestroyedEventDto:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -1175,6 +1199,7 @@ class PlayerDestroyedEventDto:
 	func get_destroyedByPlayerId() -> GUID:
 		return _destroyedByPlayerId.value
 	func clear_destroyedByPlayerId() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_destroyedByPlayerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_destroyedByPlayerId() -> GUID:
 		_destroyedByPlayerId.value = GUID.new()
@@ -1184,6 +1209,7 @@ class PlayerDestroyedEventDto:
 	func get_destroyedTimestamp() -> int:
 		return _destroyedTimestamp.value
 	func clear_destroyedTimestamp() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_destroyedTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_destroyedTimestamp(value : int) -> void:
 		_destroyedTimestamp.value = value
@@ -1240,6 +1266,7 @@ class PlayerJoinedEventDto:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -1249,6 +1276,7 @@ class PlayerJoinedEventDto:
 	func get_ship() -> int:
 		return _ship.value
 	func clear_ship() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_ship.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
 	func set_ship(value : int) -> void:
 		_ship.value = value
@@ -1257,6 +1285,7 @@ class PlayerJoinedEventDto:
 	func get_name() -> String:
 		return _name.value
 	func clear_name() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
 	func set_name(value : String) -> void:
 		_name.value = value
@@ -1265,6 +1294,7 @@ class PlayerJoinedEventDto:
 	func get_clientPlatform():
 		return _clientPlatform.value
 	func clear_clientPlatform() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_clientPlatform.value = DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM]
 	func set_clientPlatform(value) -> void:
 		_clientPlatform.value = value
@@ -1306,6 +1336,7 @@ class PlayerLeftEventDto:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -1378,6 +1409,7 @@ class PlayerMovedEventDto:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -1387,6 +1419,7 @@ class PlayerMovedEventDto:
 	func get_x() -> float:
 		return _x.value
 	func clear_x() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_x(value : float) -> void:
 		_x.value = value
@@ -1395,6 +1428,7 @@ class PlayerMovedEventDto:
 	func get_y() -> float:
 		return _y.value
 	func clear_y() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_y(value : float) -> void:
 		_y.value = value
@@ -1403,6 +1437,7 @@ class PlayerMovedEventDto:
 	func get_angle() -> float:
 		return _angle.value
 	func clear_angle() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_angle(value : float) -> void:
 		_angle.value = value
@@ -1411,6 +1446,7 @@ class PlayerMovedEventDto:
 	func get_thrustAngle() -> float:
 		return _thrustAngle.value
 	func clear_thrustAngle() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_thrustAngle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_thrustAngle(value : float) -> void:
 		_thrustAngle.value = value
@@ -1419,6 +1455,7 @@ class PlayerMovedEventDto:
 	func get_timestamp() -> int:
 		return _timestamp.value
 	func clear_timestamp() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_timestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_timestamp(value : int) -> void:
 		_timestamp.value = value
@@ -1427,6 +1464,7 @@ class PlayerMovedEventDto:
 	func get_velocity() -> float:
 		return _velocity.value
 	func clear_velocity() -> void:
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_velocity.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_velocity(value : float) -> void:
 		_velocity.value = value
@@ -1468,6 +1506,7 @@ class PlayerSpawnedEventDto:
 	func get_location() -> PlayerMovedEventDto:
 		return _location.value
 	func clear_location() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_location.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_location() -> PlayerMovedEventDto:
 		_location.value = PlayerMovedEventDto.new()
@@ -1520,6 +1559,7 @@ class PlayerScoreIncreasedEventDto:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -1529,6 +1569,7 @@ class PlayerScoreIncreasedEventDto:
 	func get_gained() -> int:
 		return _gained.value
 	func clear_gained() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_gained.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
 	func set_gained(value : int) -> void:
 		_gained.value = value
@@ -1537,6 +1578,7 @@ class PlayerScoreIncreasedEventDto:
 	func get_timestamp() -> int:
 		return _timestamp.value
 	func clear_timestamp() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_timestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_timestamp(value : int) -> void:
 		_timestamp.value = value
@@ -1583,6 +1625,7 @@ class PlayerScoreUpdatedEventDto:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -1592,6 +1635,7 @@ class PlayerScoreUpdatedEventDto:
 	func get_score() -> int:
 		return _score.value
 	func clear_score() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_score.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
 	func set_score(value : int) -> void:
 		_score.value = value
@@ -1638,6 +1682,7 @@ class ScoreEntry:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -1647,6 +1692,7 @@ class ScoreEntry:
 	func get_score() -> int:
 		return _score.value
 	func clear_score() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_score.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
 	func set_score(value : int) -> void:
 		_score.value = value
@@ -1688,6 +1734,7 @@ class ScoreBoardUpdatedEventDto:
 	func get_scores() -> Array:
 		return _scores.value
 	func clear_scores() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_scores.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func add_scores() -> ScoreEntry:
 		var element = ScoreEntry.new()
@@ -1789,254 +1836,364 @@ class Event:
 	
 	var _boltExhausted: PBField
 	func has_boltExhausted() -> bool:
-		if data[1].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[1].state == PB_SERVICE_STATE.FILLED
 	func get_boltExhausted() -> BoltExhaustedEventDto:
 		return _boltExhausted.value
 	func clear_boltExhausted() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_boltExhausted() -> BoltExhaustedEventDto:
+		data[1].state = PB_SERVICE_STATE.FILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_boltExhausted.value = BoltExhaustedEventDto.new()
 		return _boltExhausted.value
 	
 	var _boltFired: PBField
 	func has_boltFired() -> bool:
-		if data[2].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[2].state == PB_SERVICE_STATE.FILLED
 	func get_boltFired() -> BoltFiredEventDto:
 		return _boltFired.value
 	func clear_boltFired() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_boltFired() -> BoltFiredEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		data[2].state = PB_SERVICE_STATE.FILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = BoltFiredEventDto.new()
 		return _boltFired.value
 	
 	var _playerFired: PBField
 	func has_playerFired() -> bool:
-		if data[3].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[3].state == PB_SERVICE_STATE.FILLED
 	func get_playerFired() -> BoltFiredEventDto:
 		return _playerFired.value
 	func clear_playerFired() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerFired() -> BoltFiredEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		data[3].state = PB_SERVICE_STATE.FILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = BoltFiredEventDto.new()
 		return _playerFired.value
 	
 	var _playerDestroyed: PBField
 	func has_playerDestroyed() -> bool:
-		if data[4].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[4].state == PB_SERVICE_STATE.FILLED
 	func get_playerDestroyed() -> PlayerDestroyedEventDto:
 		return _playerDestroyed.value
 	func clear_playerDestroyed() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerDestroyed() -> PlayerDestroyedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		data[4].state = PB_SERVICE_STATE.FILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = PlayerDestroyedEventDto.new()
 		return _playerDestroyed.value
 	
 	var _playerJoined: PBField
 	func has_playerJoined() -> bool:
-		if data[5].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[5].state == PB_SERVICE_STATE.FILLED
 	func get_playerJoined() -> PlayerJoinedEventDto:
 		return _playerJoined.value
 	func clear_playerJoined() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerJoined() -> PlayerJoinedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		data[5].state = PB_SERVICE_STATE.FILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = PlayerJoinedEventDto.new()
 		return _playerJoined.value
 	
 	var _playerLeft: PBField
 	func has_playerLeft() -> bool:
-		if data[6].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[6].state == PB_SERVICE_STATE.FILLED
 	func get_playerLeft() -> PlayerLeftEventDto:
 		return _playerLeft.value
 	func clear_playerLeft() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerLeft() -> PlayerLeftEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		data[6].state = PB_SERVICE_STATE.FILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = PlayerLeftEventDto.new()
 		return _playerLeft.value
 	
 	var _playerMoved: PBField
 	func has_playerMoved() -> bool:
-		if data[7].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[7].state == PB_SERVICE_STATE.FILLED
 	func get_playerMoved() -> PlayerMovedEventDto:
 		return _playerMoved.value
 	func clear_playerMoved() -> void:
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerMoved() -> PlayerMovedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		data[7].state = PB_SERVICE_STATE.FILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = PlayerMovedEventDto.new()
 		return _playerMoved.value
 	
 	var _playerSpawned: PBField
 	func has_playerSpawned() -> bool:
-		if data[8].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[8].state == PB_SERVICE_STATE.FILLED
 	func get_playerSpawned() -> PlayerSpawnedEventDto:
 		return _playerSpawned.value
 	func clear_playerSpawned() -> void:
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerSpawned() -> PlayerSpawnedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		data[8].state = PB_SERVICE_STATE.FILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = PlayerSpawnedEventDto.new()
 		return _playerSpawned.value
 	
 	var _playerScoreIncreased: PBField
 	func has_playerScoreIncreased() -> bool:
-		if data[9].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[9].state == PB_SERVICE_STATE.FILLED
 	func get_playerScoreIncreased() -> PlayerScoreIncreasedEventDto:
 		return _playerScoreIncreased.value
 	func clear_playerScoreIncreased() -> void:
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerScoreIncreased() -> PlayerScoreIncreasedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		data[9].state = PB_SERVICE_STATE.FILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = PlayerScoreIncreasedEventDto.new()
 		return _playerScoreIncreased.value
 	
 	var _playerScoreUpdated: PBField
 	func has_playerScoreUpdated() -> bool:
-		if data[10].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[10].state == PB_SERVICE_STATE.FILLED
 	func get_playerScoreUpdated() -> PlayerScoreUpdatedEventDto:
 		return _playerScoreUpdated.value
 	func clear_playerScoreUpdated() -> void:
+		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerScoreUpdated() -> PlayerScoreUpdatedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		data[10].state = PB_SERVICE_STATE.FILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = PlayerScoreUpdatedEventDto.new()
 		return _playerScoreUpdated.value
 	
 	var _scoreBoardUpdated: PBField
 	func has_scoreBoardUpdated() -> bool:
-		if data[11].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[11].state == PB_SERVICE_STATE.FILLED
 	func get_scoreBoardUpdated() -> ScoreBoardUpdatedEventDto:
 		return _scoreBoardUpdated.value
 	func clear_scoreBoardUpdated() -> void:
+		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_scoreBoardUpdated() -> ScoreBoardUpdatedEventDto:
 		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
+		data[11].state = PB_SERVICE_STATE.FILLED
 		_scoreBoardUpdated.value = ScoreBoardUpdatedEventDto.new()
 		return _scoreBoardUpdated.value
 	
@@ -2077,6 +2234,7 @@ class Events:
 	func get_events() -> Array:
 		return _events.value
 	func clear_events() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func add_events() -> Event:
 		var element = Event.new()
@@ -2130,6 +2288,7 @@ class MoveCommandDto:
 	func get_moveX() -> float:
 		return _moveX.value
 	func clear_moveX() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_moveX.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_moveX(value : float) -> void:
 		_moveX.value = value
@@ -2138,6 +2297,7 @@ class MoveCommandDto:
 	func get_moveY() -> float:
 		return _moveY.value
 	func clear_moveY() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_moveY.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_moveY(value : float) -> void:
 		_moveY.value = value
@@ -2146,6 +2306,7 @@ class MoveCommandDto:
 	func get_angle() -> FloatValue:
 		return _angle.value
 	func clear_angle() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_angle() -> FloatValue:
 		_angle.value = FloatValue.new()
@@ -2246,6 +2407,7 @@ class JoinCommandDto:
 	func get_name() -> String:
 		return _name.value
 	func clear_name() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
 	func set_name(value : String) -> void:
 		_name.value = value
@@ -2254,6 +2416,7 @@ class JoinCommandDto:
 	func get_clientPlatform():
 		return _clientPlatform.value
 	func clear_clientPlatform() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_clientPlatform.value = DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM]
 	func set_clientPlatform(value) -> void:
 		_clientPlatform.value = value
@@ -2311,65 +2474,77 @@ class RequestCommand:
 	
 	var _move: PBField
 	func has_move() -> bool:
-		if data[1].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[1].state == PB_SERVICE_STATE.FILLED
 	func get_move() -> MoveCommandDto:
 		return _move.value
 	func clear_move() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_move() -> MoveCommandDto:
+		data[1].state = PB_SERVICE_STATE.FILLED
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_move.value = MoveCommandDto.new()
 		return _move.value
 	
 	var _fire: PBField
 	func has_fire() -> bool:
-		if data[2].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[2].state == PB_SERVICE_STATE.FILLED
 	func get_fire() -> FireBoltCommandDto:
 		return _fire.value
 	func clear_fire() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_fire() -> FireBoltCommandDto:
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		data[2].state = PB_SERVICE_STATE.FILLED
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_fire.value = FireBoltCommandDto.new()
 		return _fire.value
 	
 	var _spawn: PBField
 	func has_spawn() -> bool:
-		if data[3].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[3].state == PB_SERVICE_STATE.FILLED
 	func get_spawn() -> SpawnCommandDto:
 		return _spawn.value
 	func clear_spawn() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_spawn() -> SpawnCommandDto:
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		data[3].state = PB_SERVICE_STATE.FILLED
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_spawn.value = SpawnCommandDto.new()
 		return _spawn.value
 	
 	var _join: PBField
 	func has_join() -> bool:
-		if data[4].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[4].state == PB_SERVICE_STATE.FILLED
 	func get_join() -> JoinCommandDto:
 		return _join.value
 	func clear_join() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_join() -> JoinCommandDto:
 		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		data[4].state = PB_SERVICE_STATE.FILLED
 		_join.value = JoinCommandDto.new()
 		return _join.value
 	
@@ -2422,6 +2597,7 @@ class CurrentViewCommandDto:
 	func get_players() -> Array:
 		return _players.value
 	func clear_players() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_players.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func add_players() -> PlayerDto:
 		var element = PlayerDto.new()
@@ -2432,6 +2608,7 @@ class CurrentViewCommandDto:
 	func get_boltsAvailable() -> BoltsAvailableCommandDto:
 		return _boltsAvailable.value
 	func clear_boltsAvailable() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_boltsAvailable() -> BoltsAvailableCommandDto:
 		_boltsAvailable.value = BoltsAvailableCommandDto.new()
@@ -2441,6 +2618,7 @@ class CurrentViewCommandDto:
 	func get_barriers() -> Array:
 		return _barriers.value
 	func clear_barriers() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_barriers.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func add_barriers() -> BarrierDto:
 		var element = BarrierDto.new()
@@ -2483,6 +2661,7 @@ class PlayerScoreUpdateCommandDto:
 	func get_score() -> int:
 		return _score.value
 	func clear_score() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_score.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_score(value : int) -> void:
 		_score.value = value
@@ -2524,6 +2703,7 @@ class LiveBoltListCommandDto:
 	func get_bolts() -> Array:
 		return _bolts.value
 	func clear_bolts() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_bolts.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func add_bolts() -> BoltFiredEventDto:
 		var element = BoltFiredEventDto.new()
@@ -2566,6 +2746,7 @@ class BoltsAvailableCommandDto:
 	func get_available() -> int:
 		return _available.value
 	func clear_available() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_available.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT32]
 	func set_available(value : int) -> void:
 		_available.value = value
@@ -2631,6 +2812,7 @@ class DirectedCommand:
 	func get_playerId() -> GUID:
 		return _playerId.value
 	func clear_playerId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_playerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerId() -> GUID:
 		_playerId.value = GUID.new()
@@ -2638,65 +2820,77 @@ class DirectedCommand:
 	
 	var _currentView: PBField
 	func has_currentView() -> bool:
-		if data[2].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[2].state == PB_SERVICE_STATE.FILLED
 	func get_currentView() -> CurrentViewCommandDto:
 		return _currentView.value
 	func clear_currentView() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_currentView() -> CurrentViewCommandDto:
+		data[2].state = PB_SERVICE_STATE.FILLED
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_currentView.value = CurrentViewCommandDto.new()
 		return _currentView.value
 	
 	var _playerScoreUpdate: PBField
 	func has_playerScoreUpdate() -> bool:
-		if data[3].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[3].state == PB_SERVICE_STATE.FILLED
 	func get_playerScoreUpdate() -> PlayerScoreUpdateCommandDto:
 		return _playerScoreUpdate.value
 	func clear_playerScoreUpdate() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_playerScoreUpdate() -> PlayerScoreUpdateCommandDto:
 		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		data[3].state = PB_SERVICE_STATE.FILLED
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdate.value = PlayerScoreUpdateCommandDto.new()
 		return _playerScoreUpdate.value
 	
 	var _liveBoltsList: PBField
 	func has_liveBoltsList() -> bool:
-		if data[4].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[4].state == PB_SERVICE_STATE.FILLED
 	func get_liveBoltsList() -> LiveBoltListCommandDto:
 		return _liveBoltsList.value
 	func clear_liveBoltsList() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_liveBoltsList() -> LiveBoltListCommandDto:
 		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		data[4].state = PB_SERVICE_STATE.FILLED
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_liveBoltsList.value = LiveBoltListCommandDto.new()
 		return _liveBoltsList.value
 	
 	var _boltsAvailable: PBField
 	func has_boltsAvailable() -> bool:
-		if data[5].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[5].state == PB_SERVICE_STATE.FILLED
 	func get_boltsAvailable() -> BoltsAvailableCommandDto:
 		return _boltsAvailable.value
 	func clear_boltsAvailable() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_boltsAvailable.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_boltsAvailable() -> BoltsAvailableCommandDto:
 		_currentView.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdate.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_liveBoltsList.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		data[5].state = PB_SERVICE_STATE.FILLED
 		_boltsAvailable.value = BoltsAvailableCommandDto.new()
 		return _boltsAvailable.value
 	
@@ -2763,6 +2957,7 @@ class ClockSync:
 	func get_time() -> int:
 		return _time.value
 	func clear_time() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_time.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_time(value : int) -> void:
 		_time.value = value
@@ -2826,86 +3021,106 @@ class Dto:
 	
 	var _directedCommand: PBField
 	func has_directedCommand() -> bool:
-		if data[1].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[1].state == PB_SERVICE_STATE.FILLED
 	func get_directedCommand() -> DirectedCommand:
 		return _directedCommand.value
 	func clear_directedCommand() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_directedCommand() -> DirectedCommand:
+		data[1].state = PB_SERVICE_STATE.FILLED
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_directedCommand.value = DirectedCommand.new()
 		return _directedCommand.value
 	
 	var _event: PBField
 	func has_event() -> bool:
-		if data[2].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[2].state == PB_SERVICE_STATE.FILLED
 	func get_event() -> Event:
 		return _event.value
 	func clear_event() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_event() -> Event:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		data[2].state = PB_SERVICE_STATE.FILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_event.value = Event.new()
 		return _event.value
 	
 	var _events: PBField
 	func has_events() -> bool:
-		if data[3].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[3].state == PB_SERVICE_STATE.FILLED
 	func get_events() -> Events:
 		return _events.value
 	func clear_events() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_events() -> Events:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		data[3].state = PB_SERVICE_STATE.FILLED
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = Events.new()
 		return _events.value
 	
 	var _flush: PBField
 	func has_flush() -> bool:
-		if data[4].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[4].state == PB_SERVICE_STATE.FILLED
 	func get_flush() -> Flush:
 		return _flush.value
 	func clear_flush() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_flush() -> Flush:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		data[4].state = PB_SERVICE_STATE.FILLED
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_flush.value = Flush.new()
 		return _flush.value
 	
 	var _clock: PBField
 	func has_clock() -> bool:
-		if data[5].state == PB_SERVICE_STATE.FILLED:
-			return true
-		return false
+		return data[5].state == PB_SERVICE_STATE.FILLED
 	func get_clock() -> ClockSync:
 		return _clock.value
 	func clear_clock() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_clock.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 	func new_clock() -> ClockSync:
 		_directedCommand.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
 		_event.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
 		_events.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_flush.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		data[5].state = PB_SERVICE_STATE.FILLED
 		_clock.value = ClockSync.new()
 		return _clock.value
 	

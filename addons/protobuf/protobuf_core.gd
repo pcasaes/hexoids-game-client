@@ -177,7 +177,7 @@ class PBPacker:
 				value = 1
 			else:
 				value = 0
-		for i in range(9):
+		for _i in range(9):
 			var b = value & 0x7F
 			value >>= 7
 			if value:
@@ -200,7 +200,7 @@ class PBPacker:
 			spb.put_double(value)
 			bytes = spb.get_data_array()
 		else:
-			for i in range(count):
+			for _i in range(count):
 				bytes.append(value & 0xFF)
 				value >>= 8
 		return bytes
@@ -538,7 +538,7 @@ class PBPacker:
 		keys.sort()
 		for i in keys:
 			if data[i].field.value != null:
-				if typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
+				if data[i].state == PB_SERVICE_STATE.UNFILLED && typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
 					continue
 				elif data[i].field.rule == PB_RULE.REPEATED && data[i].field.value.size() == 0:
 					continue
@@ -563,7 +563,7 @@ class PBPacker:
 	
 	static func tabulate(text : String, nesting : int) -> String:
 		var tab : String = ""
-		for i in range(nesting):
+		for _i in range(nesting):
 			tab += DEBUG_TAB
 		return tab + text
 	
@@ -644,7 +644,7 @@ class PBPacker:
 		keys.sort()
 		for i in keys:
 			if data[i].field.value != null:
-				if typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
+				if data[i].state == PB_SERVICE_STATE.UNFILLED && typeof(data[i].field.value) == typeof(DEFAULT_VALUES[data[i].field.type]) && data[i].field.value == DEFAULT_VALUES[data[i].field.type]:
 					continue
 				elif data[i].field.rule == PB_RULE.REPEATED && data[i].field.value.size() == 0:
 					continue

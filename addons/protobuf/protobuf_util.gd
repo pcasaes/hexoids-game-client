@@ -29,22 +29,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-tool
-extends EditorPlugin
+static func extract_dir(file_path):
+	var parts = file_path.split("/", false)
+	parts.remove(parts.size() - 1)
+	var path
+	if file_path.begins_with("/"):
+		path = "/"
+	else:
+		path = ""
+	for part in parts:
+		path += part + "/"
+	return path
 
-var dock
-
-func _enter_tree():
-    # Initialization of the plugin goes here
-    # First load the dock scene and instance it:
-    dock = preload("res://addons/protobuf/protobuf_ui_dock.tscn").instance()
-
-    # Add the loaded scene to the docks:
-    add_control_to_dock(DOCK_SLOT_LEFT_BR, dock)
-    # Note that LEFT_UL means the left of the editor, upper-left dock
-
-func _exit_tree():
-    # Clean-up of the plugin goes here
-    # Remove the scene from the docks:
-    remove_control_from_docks( dock ) # Remove the dock
-    dock.free() # Erase the control from the memory
+static func extract_filename(file_path):
+	var parts = file_path.split("/", false)
+	return parts[parts.size() - 1]

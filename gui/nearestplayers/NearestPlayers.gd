@@ -67,7 +67,7 @@ func _in_view(ev):
 	
 func _moved(ev):
 	var playerId = ev.get_playerId().get_guid()
-	if playerId == User.id:
+	if User.is_user_from_guid(playerId):
 		my_players_moved_event = ev
 	else:
 		var d = _in_view(ev)
@@ -81,7 +81,7 @@ func _moved(ev):
 							label.text = player.displayName
 							label.set("custom_colors/font_color", player.color)
 						else:
-							label.text = playerId.substr(0, HexoidsConfig.world.hud.nameLength)
+							label.text = HexoidsConfig.world.hud.get_temp_name(playerId)
 							label.set("custom_colors/font_color", HexoidsColors.getDarkTextColor().color)
 							
 						label.visible = true

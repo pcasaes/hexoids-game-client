@@ -54,4 +54,12 @@ class HudConfig:
 	var nameLength = 8 setget ,get_nameLength
 	
 	func get_nameLength():
-		return nameLength	
+		return nameLength
+		
+	func get_temp_name(id):
+		var r = ''
+		for i in id.size():
+			r += String(id[i])
+			if r.length() >= nameLength:
+				break
+		return r.substr(0, nameLength)

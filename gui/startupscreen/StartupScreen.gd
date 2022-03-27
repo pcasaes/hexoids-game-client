@@ -29,7 +29,7 @@ func _ready():
 	
 func _on_player_action(ev, _dto):
 	var guid = ev.get_playerId().get_guid()
-	if guid == User.id:
+	if User.is_user_from_guid(guid):
 		_connected = true
 
 func _on_client_supported(v):

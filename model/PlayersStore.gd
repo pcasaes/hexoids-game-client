@@ -27,7 +27,7 @@ func _created(ev):
 	if !is_instance_valid(store.get(guid)):
 		var ship
 		var child
-		if (guid == User.id):
+		if (User.is_user_from_guid(guid)):
 			store.player = Player.instance()
 			ship = store.player.ship()
 			child = store.player

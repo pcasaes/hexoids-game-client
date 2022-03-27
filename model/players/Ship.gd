@@ -23,7 +23,7 @@ func _ready():
 	$Wake.set_color(color)
 	
 func is_players_ship():
-	return id == User.id
+	return User.is_user_from_guid(id)
 	
 func created(ev):
 	create_event = ev

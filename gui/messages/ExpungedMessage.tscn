@@ -13,9 +13,9 @@ __meta__ = {
 }
 
 [node name="Start" type="Button" parent="."]
-margin_left = 482.0
+margin_left = 117.0
 margin_top = 280.0
-margin_right = 542.0
+margin_right = 907.0
 margin_bottom = 320.0
 theme = ExtResource( 2 )
 text = "You have been booted for inactivity.Press SPACEBAR to re-join"

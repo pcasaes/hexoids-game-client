@@ -15,7 +15,7 @@ func _ready():
 	$Start.connect('pressed', self, '_start')
 
 func _on_player_left(ev, _dto):
-	if User.is_user_from_guid(ev.get_playerId()):
+	if User.is_user_from_guid(ev.get_playerId().get_guid()):
 		_on_server_disconnected()
 
 func _on_server_disconnected():
@@ -25,7 +25,7 @@ func _on_server_connected():
 	self.visible = false
 		
 func _on_player_destroyed(ev, _dto):
-	if User.is_user_from_guid(ev.get_playerId()):
+	if User.is_user_from_guid(ev.get_playerId().get_guid()):
 		self.visible = true
 	
 func _start():

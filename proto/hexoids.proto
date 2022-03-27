@@ -4,13 +4,12 @@ package pcasaes.hexoids.proto;
 
 option java_multiple_files = true;
 
-
 message FloatValue {
     float value = 1;
 }
 
 message GUID {
-    string guid = 1;
+    bytes guid = 1;
 }
 
 
@@ -207,5 +206,4 @@ message Dto {
         ClockSync clock = 5;
     }
 }
-
 
