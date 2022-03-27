@@ -18,7 +18,7 @@ func set_entry(entry):
 		$Player.text = player.displayName
 		_set_color(player.color)
 	else:
-		$Player.text = entry.get_playerId().get_guid().substr(0, HexoidsConfig.world.hud.nameLength)
+		$Player.text = HexoidsConfig.world.hud.get_temp_name(entry.get_playerId().get_guid())
 		_set_color(HexoidsColors.getDarkTextColor().color)
 
 func _set_color(c):

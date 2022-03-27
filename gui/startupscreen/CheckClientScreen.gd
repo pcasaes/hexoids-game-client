@@ -11,7 +11,7 @@ var _clientVer
 func _ready():
 	Server.connect("client_version", self, "_on_client_version")
 	if OS.get_name() == 'HTML5':
-		$VBoxContainer/Label.text = "Please clear your brower's cache or download a native client"
+		$VBoxContainer/Label.text = "Please clear your browser's cache or download a native client"
 
 	$VBoxContainer/LinkButton.connect('pressed', self, '_on_download_click')
 

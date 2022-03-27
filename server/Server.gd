@@ -2,7 +2,7 @@ extends Node
 
 const HexoidsProto = preload("res://server/HexoidsProto.gd")
 const CONFIG_FILE = "user://server.cfg"
-const CLIENT_VERSION = '0.3.0'
+const CLIENT_VERSION = '0.4.0'
 
 signal server_disconnected
 signal server_connected
@@ -202,7 +202,7 @@ func _on_received():
 			elif event.has_playerJoined():
 				emit_signal("player_joined", event.get_playerJoined(), dto)
 			elif event.has_playerLeft():
-				if event.get_playerLeft().get_playerId().get_guid() == User.id:
+				if User.is_user_from_guid(event.get_playerLeft().get_playerId().get_guid()):
 					client.disconnect_from_host()
 				emit_signal("player_left", event.get_playerLeft(), dto)
 			elif event.has_playerMoved():

@@ -19,7 +19,7 @@ func setPlayer(guid, label):
 		label.text = p.displayName
 		label.set("custom_colors/font_color", p.color)
 	else:
-		label.text = guid.substr(0, HexoidsConfig.world.hud.nameLength)
+		label.text = HexoidsConfig.world.hud.get_temp_name(guid)
 		label.set("custom_colors/font_color", HexoidsColors.getDarkTextColor().color)
 
 func getTimePart(p):

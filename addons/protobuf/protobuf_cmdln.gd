@@ -29,22 +29,39 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-tool
-extends EditorPlugin
+extends SceneTree
 
-var dock
+var Parser = preload("res://addons/protobuf/parser.gd")
+var Util = preload("res://addons/protobuf/protobuf_util.gd")
 
-func _enter_tree():
-    # Initialization of the plugin goes here
-    # First load the dock scene and instance it:
-    dock = preload("res://addons/protobuf/protobuf_ui_dock.tscn").instance()
+func error(msg : String):
+	push_error(msg)
+	OS.exit_code = 1
+	quit()
 
-    # Add the loaded scene to the docks:
-    add_control_to_dock(DOCK_SLOT_LEFT_BR, dock)
-    # Note that LEFT_UL means the left of the editor, upper-left dock
+func _init():
+	var arguments = {}
+	for argument in OS.get_cmdline_args():
+		if argument.find("=") > -1:
+			var key_value = argument.split("=")
+			arguments[key_value[0].lstrip("--")] = key_value[1]
 
-func _exit_tree():
-    # Clean-up of the plugin goes here
-    # Remove the scene from the docks:
-    remove_control_from_docks( dock ) # Remove the dock
-    dock.free() # Erase the control from the memory
+	if !arguments.has("input") || !arguments.has("output"):
+		error("Expected 2 Parameters: input and output")
+
+	var input_file_name = arguments["input"]
+	var output_file_name = arguments["output"]
+
+	var file = File.new()
+	if file.open(input_file_name, File.READ) < 0:
+		error("File: '" + input_file_name + "' not found.")
+
+	var parser = Parser.new()
+
+	if parser.work(Util.extract_dir(input_file_name), Util.extract_filename(input_file_name), \
+		output_file_name, "res://addons/protobuf/protobuf_core.gd"):
+		print("Compiled '", input_file_name, "' to '", output_file_name, "'.")
+	else:
+		error("Compilation failed.")
+
+	quit()
