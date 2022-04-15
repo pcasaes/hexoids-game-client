@@ -1762,6 +1762,105 @@ class ScoreBoardUpdatedEventDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+class MassCollapsedIntoBlackHoleEventDto:
+	func _init():
+		var service
+		
+		_id = PBField.new("id", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _id
+		service.func_ref = funcref(self, "new_id")
+		data[_id.tag] = service
+		
+		_x = PBField.new("x", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _x
+		data[_x.tag] = service
+		
+		_y = PBField.new("y", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _y
+		data[_y.tag] = service
+		
+		_startTimestamp = PBField.new("startTimestamp", PB_DATA_TYPE.INT64, PB_RULE.OPTIONAL, 4, true, DEFAULT_VALUES_3[PB_DATA_TYPE.INT64])
+		service = PBServiceField.new()
+		service.field = _startTimestamp
+		data[_startTimestamp.tag] = service
+		
+		_endTimestamp = PBField.new("endTimestamp", PB_DATA_TYPE.INT64, PB_RULE.OPTIONAL, 5, true, DEFAULT_VALUES_3[PB_DATA_TYPE.INT64])
+		service = PBServiceField.new()
+		service.field = _endTimestamp
+		data[_endTimestamp.tag] = service
+		
+	var data = {}
+	
+	var _id: PBField
+	func get_id() -> GUID:
+		return _id.value
+	func clear_id() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		_id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_id() -> GUID:
+		_id.value = GUID.new()
+		return _id.value
+	
+	var _x: PBField
+	func get_x() -> float:
+		return _x.value
+	func clear_x() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_x(value : float) -> void:
+		_x.value = value
+	
+	var _y: PBField
+	func get_y() -> float:
+		return _y.value
+	func clear_y() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_y(value : float) -> void:
+		_y.value = value
+	
+	var _startTimestamp: PBField
+	func get_startTimestamp() -> int:
+		return _startTimestamp.value
+	func clear_startTimestamp() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_startTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
+	func set_startTimestamp(value : int) -> void:
+		_startTimestamp.value = value
+	
+	var _endTimestamp: PBField
+	func get_endTimestamp() -> int:
+		return _endTimestamp.value
+	func clear_endTimestamp() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		_endTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
+	func set_endTimestamp(value : int) -> void:
+		_endTimestamp.value = value
+	
+	func to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PoolByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
 class Event:
 	func _init():
 		var service
@@ -1832,6 +1931,12 @@ class Event:
 		service.func_ref = funcref(self, "new_scoreBoardUpdated")
 		data[_scoreBoardUpdated.tag] = service
 		
+		_massCollapsedIntoBlackHole = PBField.new("massCollapsedIntoBlackHole", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 12, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _massCollapsedIntoBlackHole
+		service.func_ref = funcref(self, "new_massCollapsedIntoBlackHole")
+		data[_massCollapsedIntoBlackHole.tag] = service
+		
 	var data = {}
 	
 	var _boltExhausted: PBField
@@ -1864,6 +1969,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_boltExhausted.value = BoltExhaustedEventDto.new()
 		return _boltExhausted.value
 	
@@ -1897,6 +2004,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = BoltFiredEventDto.new()
 		return _boltFired.value
 	
@@ -1930,6 +2039,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = BoltFiredEventDto.new()
 		return _playerFired.value
 	
@@ -1963,6 +2074,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = PlayerDestroyedEventDto.new()
 		return _playerDestroyed.value
 	
@@ -1996,6 +2109,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = PlayerJoinedEventDto.new()
 		return _playerJoined.value
 	
@@ -2029,6 +2144,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = PlayerLeftEventDto.new()
 		return _playerLeft.value
 	
@@ -2062,6 +2179,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = PlayerMovedEventDto.new()
 		return _playerMoved.value
 	
@@ -2095,6 +2214,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = PlayerSpawnedEventDto.new()
 		return _playerSpawned.value
 	
@@ -2128,6 +2249,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = PlayerScoreIncreasedEventDto.new()
 		return _playerScoreIncreased.value
 	
@@ -2161,6 +2284,8 @@ class Event:
 		data[10].state = PB_SERVICE_STATE.FILLED
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = PlayerScoreUpdatedEventDto.new()
 		return _playerScoreUpdated.value
 	
@@ -2194,8 +2319,45 @@ class Event:
 		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[10].state = PB_SERVICE_STATE.UNFILLED
 		data[11].state = PB_SERVICE_STATE.FILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = ScoreBoardUpdatedEventDto.new()
 		return _scoreBoardUpdated.value
+	
+	var _massCollapsedIntoBlackHole: PBField
+	func has_massCollapsedIntoBlackHole() -> bool:
+		return data[12].state == PB_SERVICE_STATE.FILLED
+	func get_massCollapsedIntoBlackHole() -> MassCollapsedIntoBlackHoleEventDto:
+		return _massCollapsedIntoBlackHole.value
+	func clear_massCollapsedIntoBlackHole() -> void:
+		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_massCollapsedIntoBlackHole() -> MassCollapsedIntoBlackHoleEventDto:
+		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
+		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
+		data[12].state = PB_SERVICE_STATE.FILLED
+		_massCollapsedIntoBlackHole.value = MassCollapsedIntoBlackHoleEventDto.new()
+		return _massCollapsedIntoBlackHole.value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
@@ -2591,6 +2753,12 @@ class CurrentViewCommandDto:
 		service.func_ref = funcref(self, "add_barriers")
 		data[_barriers.tag] = service
 		
+		_blackhole = PBField.new("blackhole", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 4, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _blackhole
+		service.func_ref = funcref(self, "new_blackhole")
+		data[_blackhole.tag] = service
+		
 	var data = {}
 	
 	var _players: PBField
@@ -2624,6 +2792,16 @@ class CurrentViewCommandDto:
 		var element = BarrierDto.new()
 		_barriers.value.append(element)
 		return element
+	
+	var _blackhole: PBField
+	func get_blackhole() -> MassCollapsedIntoBlackHoleEventDto:
+		return _blackhole.value
+	func clear_blackhole() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_blackhole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_blackhole() -> MassCollapsedIntoBlackHoleEventDto:
+		_blackhole.value = MassCollapsedIntoBlackHoleEventDto.new()
+		return _blackhole.value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
