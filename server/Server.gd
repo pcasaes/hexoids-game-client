@@ -20,6 +20,7 @@ signal player_spawned
 signal player_score_increased
 signal player_score_updated
 signal score_board_updated
+signal mass_collapsed_into_blackHole
 
 # directed commands
 signal current_view_command
@@ -215,6 +216,8 @@ func _on_received():
 				emit_signal("player_score_updated", event.get_playerScoreUpdated(), dto)
 			elif event.has_scoreBoardUpdated():
 				emit_signal("score_board_updated", event.get_scoreBoardUpdated(), dto)
+			elif event.has_massCollapsedIntoBlackHole():
+				emit_signal("mass_collapsed_into_blackHole", event.get_massCollapsedIntoBlackHole(), dto)
 	elif (dto.has_directedCommand()):
 		var command = dto.get_directedCommand()
 		if (command.has_boltsAvailable()):
@@ -224,6 +227,8 @@ func _on_received():
 		elif (command.has_currentView()):
 			emit_signal("current_view_command", command.get_currentView(), dto)
 			emit_signal("bolts_available_command", command.get_currentView().get_boltsAvailable(), dto)
+			if (command.get_currentView().get_blackhole() != null):
+				emit_signal("mass_collapsed_into_blackHole", command.get_currentView().get_blackhole(), dto)
 		elif (command.has_liveBoltsList()):
 			emit_signal("live_bolts_list_command", command.get_liveBoltsList(), dto)
 	elif (dto.has_clock()):
