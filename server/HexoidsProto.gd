@@ -1162,6 +1162,119 @@ class BoltFiredEventDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+class BoltDivertedEventDto:
+	func _init():
+		var service
+		
+		_boltId = PBField.new("boltId", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _boltId
+		service.func_ref = funcref(self, "new_boltId")
+		data[_boltId.tag] = service
+		
+		_x = PBField.new("x", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _x
+		data[_x.tag] = service
+		
+		_y = PBField.new("y", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _y
+		data[_y.tag] = service
+		
+		_angle = PBField.new("angle", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 4, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _angle
+		data[_angle.tag] = service
+		
+		_divertTimestamp = PBField.new("divertTimestamp", PB_DATA_TYPE.INT64, PB_RULE.OPTIONAL, 5, true, DEFAULT_VALUES_3[PB_DATA_TYPE.INT64])
+		service = PBServiceField.new()
+		service.field = _divertTimestamp
+		data[_divertTimestamp.tag] = service
+		
+		_speed = PBField.new("speed", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 6, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _speed
+		data[_speed.tag] = service
+		
+	var data = {}
+	
+	var _boltId: PBField
+	func get_boltId() -> GUID:
+		return _boltId.value
+	func clear_boltId() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		_boltId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_boltId() -> GUID:
+		_boltId.value = GUID.new()
+		return _boltId.value
+	
+	var _x: PBField
+	func get_x() -> float:
+		return _x.value
+	func clear_x() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		_x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_x(value : float) -> void:
+		_x.value = value
+	
+	var _y: PBField
+	func get_y() -> float:
+		return _y.value
+	func clear_y() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		_y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_y(value : float) -> void:
+		_y.value = value
+	
+	var _angle: PBField
+	func get_angle() -> float:
+		return _angle.value
+	func clear_angle() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_angle.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_angle(value : float) -> void:
+		_angle.value = value
+	
+	var _divertTimestamp: PBField
+	func get_divertTimestamp() -> int:
+		return _divertTimestamp.value
+	func clear_divertTimestamp() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		_divertTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
+	func set_divertTimestamp(value : int) -> void:
+		_divertTimestamp.value = value
+	
+	var _speed: PBField
+	func get_speed() -> float:
+		return _speed.value
+	func clear_speed() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		_speed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_speed(value : float) -> void:
+		_speed.value = value
+	
+	func to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PoolByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
 class PlayerDestroyedEventDto:
 	func _init():
 		var service
@@ -1937,6 +2050,12 @@ class Event:
 		service.func_ref = funcref(self, "new_massCollapsedIntoBlackHole")
 		data[_massCollapsedIntoBlackHole.tag] = service
 		
+		_boltDiverted = PBField.new("boltDiverted", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 13, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _boltDiverted
+		service.func_ref = funcref(self, "new_boltDiverted")
+		data[_boltDiverted.tag] = service
+		
 	var data = {}
 	
 	var _boltExhausted: PBField
@@ -1971,6 +2090,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_boltExhausted.value = BoltExhaustedEventDto.new()
 		return _boltExhausted.value
 	
@@ -2006,6 +2127,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_boltFired.value = BoltFiredEventDto.new()
 		return _boltFired.value
 	
@@ -2041,6 +2164,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerFired.value = BoltFiredEventDto.new()
 		return _playerFired.value
 	
@@ -2076,6 +2201,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerDestroyed.value = PlayerDestroyedEventDto.new()
 		return _playerDestroyed.value
 	
@@ -2111,6 +2238,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerJoined.value = PlayerJoinedEventDto.new()
 		return _playerJoined.value
 	
@@ -2146,6 +2275,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerLeft.value = PlayerLeftEventDto.new()
 		return _playerLeft.value
 	
@@ -2181,6 +2312,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerMoved.value = PlayerMovedEventDto.new()
 		return _playerMoved.value
 	
@@ -2216,6 +2349,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerSpawned.value = PlayerSpawnedEventDto.new()
 		return _playerSpawned.value
 	
@@ -2251,6 +2386,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreIncreased.value = PlayerScoreIncreasedEventDto.new()
 		return _playerScoreIncreased.value
 	
@@ -2286,6 +2423,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_playerScoreUpdated.value = PlayerScoreUpdatedEventDto.new()
 		return _playerScoreUpdated.value
 	
@@ -2321,6 +2460,8 @@ class Event:
 		data[11].state = PB_SERVICE_STATE.FILLED
 		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_scoreBoardUpdated.value = ScoreBoardUpdatedEventDto.new()
 		return _scoreBoardUpdated.value
 	
@@ -2356,8 +2497,47 @@ class Event:
 		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[11].state = PB_SERVICE_STATE.UNFILLED
 		data[12].state = PB_SERVICE_STATE.FILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
 		_massCollapsedIntoBlackHole.value = MassCollapsedIntoBlackHoleEventDto.new()
 		return _massCollapsedIntoBlackHole.value
+	
+	var _boltDiverted: PBField
+	func has_boltDiverted() -> bool:
+		return data[13].state == PB_SERVICE_STATE.FILLED
+	func get_boltDiverted() -> BoltDivertedEventDto:
+		return _boltDiverted.value
+	func clear_boltDiverted() -> void:
+		data[13].state = PB_SERVICE_STATE.UNFILLED
+		_boltDiverted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_boltDiverted() -> BoltDivertedEventDto:
+		_boltExhausted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		_boltFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		_playerFired.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		_playerDestroyed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_playerJoined.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		_playerLeft.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		_playerMoved.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		_playerSpawned.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		_playerScoreIncreased.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		_playerScoreUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
+		_scoreBoardUpdated.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
+		_massCollapsedIntoBlackHole.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
+		data[13].state = PB_SERVICE_STATE.FILLED
+		_boltDiverted.value = BoltDivertedEventDto.new()
+		return _boltDiverted.value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
