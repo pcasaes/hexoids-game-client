@@ -2,7 +2,7 @@ extends Node
 
 const HexoidsProto = preload("res://server/HexoidsProto.gd")
 const CONFIG_FILE = "user://server.cfg"
-const CLIENT_VERSION = '0.5.0'
+const CLIENT_VERSION = '0.6.0'
 
 signal server_disconnected
 signal server_connected
@@ -11,6 +11,7 @@ signal server_connecting
 # domain events
 signal bolt_exhausted
 signal bolt_fired
+signal bolt_diverted
 signal player_fired
 signal player_destroyed
 signal player_joined
@@ -218,6 +219,8 @@ func _on_received():
 				emit_signal("score_board_updated", event.get_scoreBoardUpdated(), dto)
 			elif event.has_massCollapsedIntoBlackHole():
 				emit_signal("mass_collapsed_into_blackHole", event.get_massCollapsedIntoBlackHole(), dto)
+			elif event.has_boltDiverted():
+				emit_signal("bolt_diverted", event.get_boltDiverted(), dto)
 	elif (dto.has_directedCommand()):
 		var command = dto.get_directedCommand()
 		if (command.has_boltsAvailable()):
