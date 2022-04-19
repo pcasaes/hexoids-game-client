@@ -74,20 +74,28 @@ func _input(event):
 		Server.sendMessage(request)
 	elif captured and event is InputEventMouseMotion:
 		var request
-		if !lockPosition and !lockAngle or lockPosition == lockAngle:
-			request = requestWithAngle
-		else:
-			request = requestWithoutAngle
+		var withAngle = !lockAngle
+		var withPosition = !lockPosition
 		
-		var move = request.get_move()		
-		if !lockPosition or lockAngle == lockPosition:
-			move.set_moveX(HexoidsConfig.world.xToModel(event.relative.x))
-			move.set_moveY(HexoidsConfig.world.yToModel(event.relative.y))
-		if !lockAngle or lockAngle == lockPosition:
-			var angle = move.get_angle();
-			angle.set_value(atan2(event.relative.y, event.relative.x)+forwardDir)
-		
-		Server.sendMessage(request)
+		if withAngle or withPosition:
+			if withAngle:
+				request = requestWithAngle
+			else:
+				request = requestWithoutAngle
+			
+			var move = request.get_move()		
+			if withPosition:
+				move.set_moveX(HexoidsConfig.world.xToModel(event.relative.x))
+				move.set_moveY(HexoidsConfig.world.yToModel(event.relative.y))
+			else:
+				move.set_moveX(0)
+				move.set_moveY(0)
+			
+			if withAngle:
+				var angle = move.get_angle();
+				angle.set_value(atan2(event.relative.y, event.relative.x)+forwardDir)
+			
+			Server.sendMessage(request)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
