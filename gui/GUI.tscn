@@ -18,9 +18,6 @@ margin_top = 8.0
 margin_right = -8.0
 margin_bottom = -8.0
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="StartupScreen" parent="." instance=ExtResource( 7 )]
 anchor_right = 0.0

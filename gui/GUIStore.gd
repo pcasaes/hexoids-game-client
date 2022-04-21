@@ -20,25 +20,30 @@ func get_store():
 #func _process(delta):
 #	pass
 
+func _physics_process(_delta):
+	store._expungeExired()
 
 class GUIStore:
 	signal my_player_joined
 
-	var players = {}
+	var items = {}
 	var myPlayerId
+	
+	var toExpire = []
 	
 	func _init():
 		Server.connect('player_joined', self, '_on_player_joined')
 		Server.connect('player_left', self, '_on_player_left')
 		Server.connect('current_view_command', self, '_on_current_view_command')
 		Server.connect('server_disconnected', self, '_on_server_disconnected')
+		Server.connect('mass_collapsed_into_blackHole', self, '_on_mass_collapsed_into_blackHole')
 
 	
 	func _on_server_disconnected():
-		players.clear()
+		items.clear()
 		
 	func _on_player_left(ev, _dto):
-		players.erase(ev.get_playerId().get_guid())
+		items.erase(ev.get_playerId().get_guid())
 
 	func _on_player_joined(ev, _dto):
 		addPlayer(ev)
@@ -47,6 +52,19 @@ class GUIStore:
 		myPlayerId = dto.get_directedCommand().get_playerId().get_guid()
 		for r in cmd.get_players():
 			addPlayer(r)
+			
+	func _on_mass_collapsed_into_blackHole(ev, _dto):
+		var lbItems = GUIItemInfo.new()
+		lbItems.id = ev.get_id().get_guid()
+		lbItems.color = Color(0.9,0.9,0.9,1)
+		lbItems.name = ev.get_name()
+		lbItems.displayName = toFixedWithName(ev.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
+		items[ev.get_id().get_guid()] = lbItems
+		_expirable(lbItems, ev.get_endTimestamp() + 1000)
+		
+	func _expirable(item, expireAt):
+		item.expireAt = expireAt
+		toExpire.push_back(item)
 		
 	func toFixedWithName(name, length, chr):
 		if name.length() > length:
@@ -58,32 +76,39 @@ class GUIStore:
 		return name;	
 	
 	func addPlayer(p):
-		var lbPlayer = GUIPlayerInfo.new()
-		lbPlayer.color = HexoidsColors.get(p.get_ship()).lighterColor
-		lbPlayer.name = p.get_name()
-		lbPlayer.displayName = toFixedWithName(p.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
-		players[p.get_playerId().get_guid()] = lbPlayer
+		var lbItems = GUIItemInfo.new()
+		lbItems.id = p.get_playerId().get_guid()
+		lbItems.color = HexoidsColors.get(p.get_ship()).lighterColor
+		lbItems.name = p.get_name()
+		lbItems.displayName = toFixedWithName(p.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
+		items[p.get_playerId().get_guid()] = lbItems
 		if p.get_playerId().get_guid() == myPlayerId:
-			emit_signal('my_player_joined', lbPlayer)
+			emit_signal('my_player_joined', lbItems)
+			
+	func _expungeExired():
+		while toExpire.size() > 0 and toExpire[0].expireAt < HClock.clock.gameTime():
+			remove(toExpire.pop_front().id)
 	
 	func remove(guid):
-		players.erase(guid)
+		items.erase(guid)
 		
 	func get(uuid):
-		return players.get(uuid)
+		return items.get(uuid)
 		
 	func all():
-		return players.values()
+		return items.values()
 		
 	func clear():
-		players.clear()
+		items.clear()
 		
 	func getMyPlayerId():
 		return myPlayerId
 
 
-class GUIPlayerInfo:
+class GUIItemInfo:
+	var id
 	var name
 	var displayName
 	var color
+	var expireAt
 	

@@ -29,9 +29,6 @@ func _on_mass_collapsed_into_blackHole(ev, _dto):
 		
 	position = Vector2(x, y)
 	
-	
-	print('Enabling blackhole')
-	
 	_set_enable(true)
 	
 func _set_enable(en):

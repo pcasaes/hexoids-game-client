@@ -66,9 +66,9 @@ func _on_player_destroyed(ev, _dto):
 	var ship = store.get(guid)
 	if is_instance_valid(ship):
 		ship.destroyed()
-		store.emit_signal('ship_destroyed', ev.get_destroyedByPlayerId().get_guid(), ship)
+		store.emit_signal('ship_destroyed', ev.get_destroyedById().get_guid(), ship)
 		if ship.is_players_ship():
-			store.emit_signal('users_ship_destroyed', ev.get_destroyedByPlayerId().get_guid(), ship)
+			store.emit_signal('users_ship_destroyed', ev.get_destroyedById().get_guid(), ship)
 			
 		
 func _on_player_spawned(ev, _dto):
