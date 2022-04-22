@@ -98,7 +98,7 @@ script = ExtResource( 3 )
 [node name="haze" type="AnimatedSprite" parent="."]
 frames = SubResource( 7 )
 animation = "blackhole"
-frame = 3
+frame = 1
 playing = true
 
 [node name="accretion" type="AnimatedSprite" parent="."]
@@ -106,5 +106,5 @@ modulate = Color( 0.737255, 0.596078, 0.431373, 1 )
 z_index = 6
 z_as_relative = false
 frames = SubResource( 16 )
-frame = 1
+frame = 2
 playing = true

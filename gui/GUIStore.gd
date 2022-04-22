@@ -20,11 +20,10 @@ func get_store():
 #func _process(delta):
 #	pass
 
-
 class GUIStore:
 	signal my_player_joined
 
-	var players = {}
+	var items = {}
 	var myPlayerId
 	
 	func _init():
@@ -32,13 +31,14 @@ class GUIStore:
 		Server.connect('player_left', self, '_on_player_left')
 		Server.connect('current_view_command', self, '_on_current_view_command')
 		Server.connect('server_disconnected', self, '_on_server_disconnected')
+		BlackholeStore.connect('blackhole_event', self, '_on_blackhole_event')
 
 	
 	func _on_server_disconnected():
-		players.clear()
+		items.clear()
 		
 	func _on_player_left(ev, _dto):
-		players.erase(ev.get_playerId().get_guid())
+		items.erase(ev.get_playerId().get_guid())
 
 	func _on_player_joined(ev, _dto):
 		addPlayer(ev)
@@ -47,6 +47,17 @@ class GUIStore:
 		myPlayerId = dto.get_directedCommand().get_playerId().get_guid()
 		for r in cmd.get_players():
 			addPlayer(r)
+			
+	func _on_blackhole_event(ev, started):
+		if started:
+			var lbItems = GUIItemInfo.new()
+			lbItems.id = ev.get_id().get_guid()
+			lbItems.color = Color(0.9,0.9,0.9,1)
+			lbItems.name = ev.get_name()
+			lbItems.displayName = toFixedWithName(ev.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
+			items[ev.get_id().get_guid()] = lbItems
+		else:
+			remove(ev.get_id().get_guid())
 		
 	func toFixedWithName(name, length, chr):
 		if name.length() > length:
@@ -58,31 +69,33 @@ class GUIStore:
 		return name;	
 	
 	func addPlayer(p):
-		var lbPlayer = GUIPlayerInfo.new()
-		lbPlayer.color = HexoidsColors.get(p.get_ship()).lighterColor
-		lbPlayer.name = p.get_name()
-		lbPlayer.displayName = toFixedWithName(p.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
-		players[p.get_playerId().get_guid()] = lbPlayer
+		var lbItems = GUIItemInfo.new()
+		lbItems.id = p.get_playerId().get_guid()
+		lbItems.color = HexoidsColors.get(p.get_ship()).lighterColor
+		lbItems.name = p.get_name()
+		lbItems.displayName = toFixedWithName(p.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
+		items[p.get_playerId().get_guid()] = lbItems
 		if p.get_playerId().get_guid() == myPlayerId:
-			emit_signal('my_player_joined', lbPlayer)
+			emit_signal('my_player_joined', lbItems)
 	
 	func remove(guid):
-		players.erase(guid)
+		items.erase(guid)
 		
 	func get(uuid):
-		return players.get(uuid)
+		return items.get(uuid)
 		
 	func all():
-		return players.values()
+		return items.values()
 		
 	func clear():
-		players.clear()
+		items.clear()
 		
 	func getMyPlayerId():
 		return myPlayerId
 
 
-class GUIPlayerInfo:
+class GUIItemInfo:
+	var id
 	var name
 	var displayName
 	var color

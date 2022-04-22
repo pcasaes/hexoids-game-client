@@ -29,7 +29,7 @@ func getTimePart(p):
 	return h
 
 func loadEvent(ev):
-	setPlayer(ev.get_destroyedByPlayerId().get_guid(), $Destroyer)
+	setPlayer(ev.get_destroyedById().get_guid(), $Destroyer)
 	setPlayer(ev.get_playerId().get_guid(), $Destroyee)
 	var dt = OS.get_datetime_from_unix_time(ev.get_destroyedTimestamp() / 1000)
 	

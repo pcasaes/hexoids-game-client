@@ -14,7 +14,7 @@ func _ready():
 
 func _on_resize():
 	self.rect_min_size = Vector2(0, get_viewport_rect().size.y-16)
-	$HUD/Right.set("custom_constants/separation", get_viewport_rect().size.y / 2 - 16)
+	#s$HUD/Right.set("custom_constants/separation", get_viewport_rect().size.y / 2 - 16)
 	$HUD/Left.rect_min_size.x = get_viewport_rect().size.x / 2 - 130
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

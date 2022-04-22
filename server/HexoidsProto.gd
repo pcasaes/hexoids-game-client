@@ -1285,11 +1285,11 @@ class PlayerDestroyedEventDto:
 		service.func_ref = funcref(self, "new_playerId")
 		data[_playerId.tag] = service
 		
-		_destroyedByPlayerId = PBField.new("destroyedByPlayerId", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		_destroyedById = PBField.new("destroyedById", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
 		service = PBServiceField.new()
-		service.field = _destroyedByPlayerId
-		service.func_ref = funcref(self, "new_destroyedByPlayerId")
-		data[_destroyedByPlayerId.tag] = service
+		service.field = _destroyedById
+		service.func_ref = funcref(self, "new_destroyedById")
+		data[_destroyedById.tag] = service
 		
 		_destroyedTimestamp = PBField.new("destroyedTimestamp", PB_DATA_TYPE.INT64, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.INT64])
 		service = PBServiceField.new()
@@ -1308,15 +1308,15 @@ class PlayerDestroyedEventDto:
 		_playerId.value = GUID.new()
 		return _playerId.value
 	
-	var _destroyedByPlayerId: PBField
-	func get_destroyedByPlayerId() -> GUID:
-		return _destroyedByPlayerId.value
-	func clear_destroyedByPlayerId() -> void:
+	var _destroyedById: PBField
+	func get_destroyedById() -> GUID:
+		return _destroyedById.value
+	func clear_destroyedById() -> void:
 		data[2].state = PB_SERVICE_STATE.UNFILLED
-		_destroyedByPlayerId.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
-	func new_destroyedByPlayerId() -> GUID:
-		_destroyedByPlayerId.value = GUID.new()
-		return _destroyedByPlayerId.value
+		_destroyedById.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_destroyedById() -> GUID:
+		_destroyedById.value = GUID.new()
+		return _destroyedById.value
 	
 	var _destroyedTimestamp: PBField
 	func get_destroyedTimestamp() -> int:
@@ -1905,6 +1905,11 @@ class MassCollapsedIntoBlackHoleEventDto:
 		service.field = _endTimestamp
 		data[_endTimestamp.tag] = service
 		
+		_name = PBField.new("name", PB_DATA_TYPE.STRING, PB_RULE.OPTIONAL, 6, true, DEFAULT_VALUES_3[PB_DATA_TYPE.STRING])
+		service = PBServiceField.new()
+		service.field = _name
+		data[_name.tag] = service
+		
 	var data = {}
 	
 	var _id: PBField
@@ -1952,6 +1957,15 @@ class MassCollapsedIntoBlackHoleEventDto:
 		_endTimestamp.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_endTimestamp(value : int) -> void:
 		_endTimestamp.value = value
+	
+	var _name: PBField
+	func get_name() -> String:
+		return _name.value
+	func clear_name() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		_name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
+	func set_name(value : String) -> void:
+		_name.value = value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)

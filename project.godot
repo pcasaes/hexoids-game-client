@@ -39,6 +39,7 @@ TrigUtils="*res://utils/TrigUtils.gd"
 HClock="*res://utils/HClock.gd"
 PlayersStore="*res://model/PlayersStore.gd"
 BoltsStore="*res://model/bolts/BoltsStore.gd"
+BlackholeStore="*res://model/blackhole/BlackholeStore.gd"
 GUIStore="*res://gui/GUIStore.gd"
 
 [editor_plugins]
