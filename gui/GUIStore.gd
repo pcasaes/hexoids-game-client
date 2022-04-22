@@ -20,23 +20,18 @@ func get_store():
 #func _process(delta):
 #	pass
 
-func _physics_process(_delta):
-	store._expungeExired()
-
 class GUIStore:
 	signal my_player_joined
 
 	var items = {}
 	var myPlayerId
 	
-	var toExpire = []
-	
 	func _init():
 		Server.connect('player_joined', self, '_on_player_joined')
 		Server.connect('player_left', self, '_on_player_left')
 		Server.connect('current_view_command', self, '_on_current_view_command')
 		Server.connect('server_disconnected', self, '_on_server_disconnected')
-		Server.connect('mass_collapsed_into_blackHole', self, '_on_mass_collapsed_into_blackHole')
+		BlackholeStore.connect('blackhole_event', self, '_on_blackhole_event')
 
 	
 	func _on_server_disconnected():
@@ -53,18 +48,16 @@ class GUIStore:
 		for r in cmd.get_players():
 			addPlayer(r)
 			
-	func _on_mass_collapsed_into_blackHole(ev, _dto):
-		var lbItems = GUIItemInfo.new()
-		lbItems.id = ev.get_id().get_guid()
-		lbItems.color = Color(0.9,0.9,0.9,1)
-		lbItems.name = ev.get_name()
-		lbItems.displayName = toFixedWithName(ev.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
-		items[ev.get_id().get_guid()] = lbItems
-		_expirable(lbItems, ev.get_endTimestamp() + 1000)
-		
-	func _expirable(item, expireAt):
-		item.expireAt = expireAt
-		toExpire.push_back(item)
+	func _on_blackhole_event(ev, started):
+		if started:
+			var lbItems = GUIItemInfo.new()
+			lbItems.id = ev.get_id().get_guid()
+			lbItems.color = Color(0.9,0.9,0.9,1)
+			lbItems.name = ev.get_name()
+			lbItems.displayName = toFixedWithName(ev.get_name(), HexoidsConfig.world.hud.nameLength, ' ').to_upper()
+			items[ev.get_id().get_guid()] = lbItems
+		else:
+			remove(ev.get_id().get_guid())
 		
 	func toFixedWithName(name, length, chr):
 		if name.length() > length:
@@ -84,10 +77,6 @@ class GUIStore:
 		items[p.get_playerId().get_guid()] = lbItems
 		if p.get_playerId().get_guid() == myPlayerId:
 			emit_signal('my_player_joined', lbItems)
-			
-	func _expungeExired():
-		while toExpire.size() > 0 and toExpire[0].expireAt < HClock.clock.gameTime():
-			remove(toExpire.pop_front().id)
 	
 	func remove(guid):
 		items.erase(guid)
@@ -110,5 +99,4 @@ class GUIItemInfo:
 	var name
 	var displayName
 	var color
-	var expireAt
 	

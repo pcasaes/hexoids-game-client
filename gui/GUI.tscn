@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://gui/GUI.gd" type="Script" id=1]
 [ext_resource path="res://gui/leaderboard/LeaderBoard.tscn" type="PackedScene" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://gui/startupscreen/StartupScreen.tscn" type="PackedScene" id=7]
 [ext_resource path="res://gui/messages/ExpungedMessage.tscn" type="PackedScene" id=8]
 [ext_resource path="res://gui/boltsavailable/BoltsAvailable.tscn" type="PackedScene" id=9]
+[ext_resource path="res://gui/statuseffect/StatusEffect.tscn" type="PackedScene" id=10]
 
 [node name="GUI" type="MarginContainer"]
 anchor_right = 1.0
@@ -50,43 +51,51 @@ grow_vertical = 0
 size_flags_vertical = 3
 
 [node name="Middle" type="VBoxContainer" parent="HUD"]
-margin_right = 40.0
-margin_bottom = 40.0
+margin_left = 4.0
+margin_right = 256.0
+margin_bottom = 584.0
 grow_horizontal = 2
 size_flags_horizontal = 5
 size_flags_vertical = 3
 
 [node name="BoltsAvailable" parent="HUD/Middle" instance=ExtResource( 9 )]
 anchor_right = 0.0
-margin_left = 14.0
-margin_top = 14.0
-margin_right = 26.0
-margin_bottom = 26.0
+margin_right = 252.0
+margin_bottom = 584.0
 size_flags_horizontal = 5
 size_flags_vertical = 3
 
 [node name="Right" type="VBoxContainer" parent="HUD"]
-margin_left = 4.0
+margin_left = 260.0
 margin_right = 1008.0
 margin_bottom = 584.0
 size_flags_horizontal = 3
-custom_constants/separation = 400
+size_flags_vertical = 3
 
 [node name="PlayerScore" parent="HUD/Right" instance=ExtResource( 3 )]
 anchor_left = 0.0
 anchor_right = 0.0
 margin_left = 0.0
-margin_right = 1004.0
-margin_bottom = 17.0
+margin_right = 748.0
+margin_bottom = 20.0
 
 [node name="NearestPlayers" parent="HUD/Right" instance=ExtResource( 5 )]
 anchor_left = 0.0
 anchor_right = 0.0
 margin_left = 0.0
-margin_top = 21.0
-margin_right = 1004.0
+margin_top = 24.0
+margin_right = 748.0
+margin_bottom = 302.0
+size_flags_vertical = 3
+
+[node name="StatusEffect" parent="HUD/Right" instance=ExtResource( 10 )]
+anchor_left = 0.0
+anchor_right = 0.0
+margin_left = 0.0
+margin_top = 306.0
+margin_right = 748.0
 margin_bottom = 584.0
-grow_vertical = 0
+size_flags_vertical = 3
 
 [node name="RespawnMessage" parent="." instance=ExtResource( 6 )]
 anchor_right = 0.0
