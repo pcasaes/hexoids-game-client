@@ -16,7 +16,7 @@ func _ready():
 #func _process(delta):
 #	pass
 
-func _player_created(ship, child):
+func _player_created(ship, child, _isUser):
 	add_child(child)
 	ship._on_Main_main_ready(main)	
 

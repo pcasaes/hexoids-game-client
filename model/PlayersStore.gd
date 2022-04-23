@@ -27,7 +27,8 @@ func _created(ev):
 	if !is_instance_valid(store.get(guid)):
 		var ship
 		var child
-		if (User.is_user_from_guid(guid)):
+		var isUser = User.is_user_from_guid(guid)
+		if (isUser):
 			store.player = Player.instance()
 			ship = store.player.ship()
 			child = store.player
@@ -37,7 +38,7 @@ func _created(ev):
 			
 		store.set(guid, ship)
 		ship.created(ev)
-		store.emit_signal('player_created', ship, child)
+		store.emit_signal('player_created', ship, child, isUser)
 		
 func _moved(ev):
 	var guid = ev.get_playerId().get_guid()
