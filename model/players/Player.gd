@@ -72,27 +72,27 @@ func _input(event):
 		lockPosition = true
 	elif event.is_action_released("ui_lock_position"):
 		lockPosition = false
-	elif event.is_action_released("ui_min_inertial_dampen_factor_1"):
+	elif event.is_action_released("ui_min_inertial_dampen_factor_6"):
 		min_inertial_dampen_factor = 0.5
 		if is_min_inertial_dampen_factor:
 			_set_inertial_dampen(min_inertial_dampen_factor)
-	elif event.is_action_released("ui_min_inertial_dampen_factor_2"):
+	elif event.is_action_released("ui_min_inertial_dampen_factor_5"):
 		min_inertial_dampen_factor = 0.1
 		if is_min_inertial_dampen_factor:
 			_set_inertial_dampen(min_inertial_dampen_factor)
-	elif event.is_action_released("ui_min_inertial_dampen_factor_3"):
+	elif event.is_action_released("ui_min_inertial_dampen_factor_4"):
 		min_inertial_dampen_factor = 0.01
 		if is_min_inertial_dampen_factor:
 			_set_inertial_dampen(min_inertial_dampen_factor)
-	elif event.is_action_released("ui_min_inertial_dampen_factor_4"):
+	elif event.is_action_released("ui_min_inertial_dampen_factor_3"):
 		min_inertial_dampen_factor = 0.001
 		if is_min_inertial_dampen_factor:
 			_set_inertial_dampen(min_inertial_dampen_factor)
-	elif event.is_action_released("ui_min_inertial_dampen_factor_5"):
+	elif event.is_action_released("ui_min_inertial_dampen_factor_2"):
 		min_inertial_dampen_factor = 0.00005
 		if is_min_inertial_dampen_factor:
 			_set_inertial_dampen(min_inertial_dampen_factor)
-	elif event.is_action_released("ui_min_inertial_dampen_factor_6"):
+	elif event.is_action_released("ui_min_inertial_dampen_factor_1"):
 		min_inertial_dampen_factor = 0.000001
 		if is_min_inertial_dampen_factor:
 			_set_inertial_dampen(min_inertial_dampen_factor)
