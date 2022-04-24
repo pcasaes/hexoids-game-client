@@ -14,7 +14,7 @@ func _ready():
 	if create_event == null:
 		color = HexoidsColors.get(0).getColor()
 	else:
-		color = 	HexoidsColors.get(create_event.get_ship()).getColor()
+		color = HexoidsColors.get(create_event.get_ship()).getColor()
 
 	$Ship.modulate = color
 	$Ship.play("rest")

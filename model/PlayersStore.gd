@@ -44,7 +44,9 @@ func _moved(ev):
 	var guid = ev.get_playerId().get_guid()
 	var ship = store.get(guid)
 	if is_instance_valid(ship):
-		ship.moved(ev)	
+		ship.moved(ev)
+		if User.is_user_from_guid(guid):
+			store.emit_signal("users_ship_moved", ev, ship)	
 		
 func _on_player_joined(ev, _dto):
 	_created(ev)
@@ -100,6 +102,7 @@ class PlayersStore:
 	signal player_created
 	signal ship_destroyed
 	signal users_ship_destroyed
+	signal users_ship_moved
 	
 	var players = {}
 	

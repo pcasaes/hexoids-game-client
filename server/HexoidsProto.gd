@@ -1476,6 +1476,12 @@ class PlayerLeftEventDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+enum MoveReason {
+	SHOCKWAVE_PUSH = 0,
+	BLACKHOLE_PULL = 1,
+	BLACKHOLE_TELEPORT = 2
+}
+
 class PlayerMovedEventDto:
 	func _init():
 		var service
@@ -1520,6 +1526,11 @@ class PlayerMovedEventDto:
 		service = PBServiceField.new()
 		service.field = _inertialDampenFactor
 		data[_inertialDampenFactor.tag] = service
+		
+		_reasons = PBField.new("reasons", PB_DATA_TYPE.ENUM, PB_RULE.REPEATED, 9, true, [])
+		service = PBServiceField.new()
+		service.field = _reasons
+		data[_reasons.tag] = service
 		
 	var data = {}
 	
@@ -1595,6 +1606,15 @@ class PlayerMovedEventDto:
 		_inertialDampenFactor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_inertialDampenFactor(value : float) -> void:
 		_inertialDampenFactor.value = value
+	
+	var _reasons: PBField
+	func get_reasons() -> Array:
+		return _reasons.value
+	func clear_reasons() -> void:
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		_reasons.value = DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM]
+	func add_reasons(value) -> void:
+		_reasons.value.append(value)
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
