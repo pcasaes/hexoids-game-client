@@ -1,5 +1,7 @@
 extends Node2D
 
+const HexoidsProto = preload("res://server/HexoidsProto.gd")
+
 const ANIM_THRUST_TIME = 0.05
 
 # Declare member variables here. Examples:
@@ -34,14 +36,18 @@ func spawned(ev):
 	_set_visible(true)
 	moved(ev.get_location(), true)	
 
-func moved(ev, spawned = false):
+func moved(ev, spawned = false, currentView = false):
 	var thrustAngle;
-	if ev.has_method('get_thrustAngle'):
+	if !currentView:
 		thrustAngle = ev.get_thrustAngle()
 	else:
 		thrustAngle = ev.get_angle()
+		
+	if !spawned and !currentView and ev.get_reasons().find(HexoidsProto.MoveReason.BLACKHOLE_TELEPORT) > -1:
+		modulate.a = 0
+		
 	
-	moveTo(
+	_moveTo(
 		HexoidsConfig.world.xToView(ev.get_x()),
 		HexoidsConfig.world.yToView(ev.get_y()),
 		ev.get_angle(),
@@ -50,7 +56,7 @@ func moved(ev, spawned = false):
 	)	
 
 
-func moveTo(x, y, angle, thrustAngle, spawned):
+func _moveTo(x, y, angle, thrustAngle, spawned):
 	
 	rotation = angle
 	if spawned:
@@ -89,11 +95,16 @@ func fired():
 func _set_visible(v):
 	$Ship.set_visible(v)	
 	$ShipTint.set_visible(v)	
-	$Wake.set_visible(v)	
+	$Wake.set_visible(v)
+	if v:
+		modulate.a = 0.0
+			
 	
-func _physics_process(_delta):
+func _physics_process(delta):
 	if $Ship.visible:
-		animThrustTime = animThrustTime + _delta
+		if modulate.a < 1.0:
+			modulate.a = modulate.a + (delta * 3)
+		animThrustTime = animThrustTime + delta
 		if animThrustTime > ANIM_THRUST_TIME:
 			$Ship.play("rest")
 		
