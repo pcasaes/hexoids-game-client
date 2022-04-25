@@ -27,7 +27,8 @@ func _created(ev):
 	if !is_instance_valid(store.get(guid)):
 		var ship
 		var child
-		if (User.is_user_from_guid(guid)):
+		var isUser = User.is_user_from_guid(guid)
+		if (isUser):
 			store.player = Player.instance()
 			ship = store.player.ship()
 			child = store.player
@@ -37,13 +38,15 @@ func _created(ev):
 			
 		store.set(guid, ship)
 		ship.created(ev)
-		store.emit_signal('player_created', ship, child)
+		store.emit_signal('player_created', ship, child, isUser)
 		
-func _moved(ev):
+func _moved(ev, currentView = false):
 	var guid = ev.get_playerId().get_guid()
 	var ship = store.get(guid)
 	if is_instance_valid(ship):
-		ship.moved(ev)	
+		ship.moved(ev, false, currentView)
+		if !currentView and User.is_user_from_guid(guid):
+			store.emit_signal("users_ship_moved", ev, ship)	
 		
 func _on_player_joined(ev, _dto):
 	_created(ev)
@@ -83,7 +86,7 @@ func _on_player_moved(ev, _dto):
 func _on_current_view_command(cmd, _dto):
 	for r in cmd.get_players():
 		_created(r)
-		_moved(r)
+		_moved(r, true)
 				
 
 func get_store():
@@ -99,6 +102,7 @@ class PlayersStore:
 	signal player_created
 	signal ship_destroyed
 	signal users_ship_destroyed
+	signal users_ship_moved
 	
 	var players = {}
 	

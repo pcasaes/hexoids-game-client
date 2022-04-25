@@ -1476,6 +1476,12 @@ class PlayerLeftEventDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+enum MoveReason {
+	SHOCKWAVE_PUSH = 0,
+	BLACKHOLE_PULL = 1,
+	BLACKHOLE_TELEPORT = 2
+}
+
 class PlayerMovedEventDto:
 	func _init():
 		var service
@@ -1515,6 +1521,16 @@ class PlayerMovedEventDto:
 		service = PBServiceField.new()
 		service.field = _velocity
 		data[_velocity.tag] = service
+		
+		_inertialDampenFactor = PBField.new("inertialDampenFactor", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 8, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _inertialDampenFactor
+		data[_inertialDampenFactor.tag] = service
+		
+		_reasons = PBField.new("reasons", PB_DATA_TYPE.ENUM, PB_RULE.REPEATED, 9, true, [])
+		service = PBServiceField.new()
+		service.field = _reasons
+		data[_reasons.tag] = service
 		
 	var data = {}
 	
@@ -1581,6 +1597,24 @@ class PlayerMovedEventDto:
 		_velocity.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
 	func set_velocity(value : float) -> void:
 		_velocity.value = value
+	
+	var _inertialDampenFactor: PBField
+	func get_inertialDampenFactor() -> float:
+		return _inertialDampenFactor.value
+	func clear_inertialDampenFactor() -> void:
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		_inertialDampenFactor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_inertialDampenFactor(value : float) -> void:
+		_inertialDampenFactor.value = value
+	
+	var _reasons: PBField
+	func get_reasons() -> Array:
+		return _reasons.value
+	func clear_reasons() -> void:
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		_reasons.value = DEFAULT_VALUES_3[PB_DATA_TYPE.ENUM]
+	func add_reasons(value) -> void:
+		_reasons.value.append(value)
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)
@@ -2689,6 +2723,47 @@ class MoveCommandDto:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+class SetFixedInertialDampenFactorCommandDto:
+	func _init():
+		var service
+		
+		_factor = PBField.new("factor", PB_DATA_TYPE.FLOAT, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT])
+		service = PBServiceField.new()
+		service.field = _factor
+		data[_factor.tag] = service
+		
+	var data = {}
+	
+	var _factor: PBField
+	func get_factor() -> float:
+		return _factor.value
+	func clear_factor() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		_factor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.FLOAT]
+	func set_factor(value : float) -> void:
+		_factor.value = value
+	
+	func to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PoolByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PoolByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
 class FireBoltCommandDto:
 	func _init():
 		var service
@@ -2826,6 +2901,12 @@ class RequestCommand:
 		service.func_ref = funcref(self, "new_join")
 		data[_join.tag] = service
 		
+		_setFixedIntertialDampenFactor = PBField.new("setFixedIntertialDampenFactor", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 5, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = _setFixedIntertialDampenFactor
+		service.func_ref = funcref(self, "new_setFixedIntertialDampenFactor")
+		data[_setFixedIntertialDampenFactor.tag] = service
+		
 	var data = {}
 	
 	var _move: PBField
@@ -2844,6 +2925,8 @@ class RequestCommand:
 		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_setFixedIntertialDampenFactor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_move.value = MoveCommandDto.new()
 		return _move.value
 	
@@ -2863,6 +2946,8 @@ class RequestCommand:
 		data[3].state = PB_SERVICE_STATE.UNFILLED
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_setFixedIntertialDampenFactor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_fire.value = FireBoltCommandDto.new()
 		return _fire.value
 	
@@ -2882,6 +2967,8 @@ class RequestCommand:
 		data[3].state = PB_SERVICE_STATE.FILLED
 		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[4].state = PB_SERVICE_STATE.UNFILLED
+		_setFixedIntertialDampenFactor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_spawn.value = SpawnCommandDto.new()
 		return _spawn.value
 	
@@ -2901,8 +2988,31 @@ class RequestCommand:
 		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[3].state = PB_SERVICE_STATE.UNFILLED
 		data[4].state = PB_SERVICE_STATE.FILLED
+		_setFixedIntertialDampenFactor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
 		_join.value = JoinCommandDto.new()
 		return _join.value
+	
+	var _setFixedIntertialDampenFactor: PBField
+	func has_setFixedIntertialDampenFactor() -> bool:
+		return data[5].state == PB_SERVICE_STATE.FILLED
+	func get_setFixedIntertialDampenFactor() -> SetFixedInertialDampenFactorCommandDto:
+		return _setFixedIntertialDampenFactor.value
+	func clear_setFixedIntertialDampenFactor() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		_setFixedIntertialDampenFactor.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_setFixedIntertialDampenFactor() -> SetFixedInertialDampenFactorCommandDto:
+		_move.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		_fire.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		_spawn.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		_join.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		data[5].state = PB_SERVICE_STATE.FILLED
+		_setFixedIntertialDampenFactor.value = SetFixedInertialDampenFactorCommandDto.new()
+		return _setFixedIntertialDampenFactor.value
 	
 	func to_string() -> String:
 		return PBPacker.message_to_string(data)

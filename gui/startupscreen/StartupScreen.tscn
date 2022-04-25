@@ -96,7 +96,7 @@ size_flags_vertical = 3
 
 [node name="Animation" type="AnimatedSprite" parent="Loading/CenterContainer/Animation"]
 frames = SubResource( 9 )
-frame = 1
+frame = 9
 playing = true
 
 [node name="Title" type="Label" parent="Loading"]
@@ -204,6 +204,7 @@ Trackpad/Mouse for movements.
 C to fire.
 Z pressed to lock direction.
 X pressed to lock position.
+Q E 1-6 controls intertia
 M toggle audio"
 
 [node name="DownloadLink" type="LinkButton" parent="screen1/StartScreen/VBoxContainer"]

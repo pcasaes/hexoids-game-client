@@ -1,0 +1,37 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://gui/controls/BoltProgress.tres" type="Gradient" id=1]
+[ext_resource path="res://gui/controls/BoltsAvailable.gd" type="Script" id=2]
+[ext_resource path="res://hexoids_theme.tres" type="Theme" id=3]
+
+[sub_resource type="StyleBoxFlat" id=2]
+content_margin_left = 6.0
+bg_color = Color( 0.6, 0.6, 0.6, 0 )
+
+[sub_resource type="GradientTexture" id=4]
+gradient = ExtResource( 1 )
+width = 240
+
+[sub_resource type="GradientTexture" id=1]
+gradient = ExtResource( 1 )
+width = 240
+
+[node name="PanelContainer" type="PanelContainer"]
+margin_right = 1024.0
+margin_bottom = 20.0
+theme = ExtResource( 3 )
+custom_styles/panel = SubResource( 2 )
+script = ExtResource( 2 )
+
+[node name="progress" type="TextureProgress" parent="."]
+margin_left = 6.0
+margin_right = 1024.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 240, 20 )
+size_flags_horizontal = 3
+max_value = 12.0
+texture_under = SubResource( 4 )
+texture_progress = SubResource( 1 )
+fill_mode = 1
+nine_patch_stretch = true
+stretch_margin_bottom = 8

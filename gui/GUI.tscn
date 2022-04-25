@@ -8,7 +8,7 @@
 [ext_resource path="res://gui/messages/RespawnMessage.tscn" type="PackedScene" id=6]
 [ext_resource path="res://gui/startupscreen/StartupScreen.tscn" type="PackedScene" id=7]
 [ext_resource path="res://gui/messages/ExpungedMessage.tscn" type="PackedScene" id=8]
-[ext_resource path="res://gui/boltsavailable/BoltsAvailable.tscn" type="PackedScene" id=9]
+[ext_resource path="res://gui/controls/Controls.tscn" type="PackedScene" id=9]
 [ext_resource path="res://gui/statuseffect/StatusEffect.tscn" type="PackedScene" id=10]
 
 [node name="GUI" type="MarginContainer"]
@@ -58,12 +58,10 @@ grow_horizontal = 2
 size_flags_horizontal = 5
 size_flags_vertical = 3
 
-[node name="BoltsAvailable" parent="HUD/Middle" instance=ExtResource( 9 )]
+[node name="Controls" parent="HUD/Middle" instance=ExtResource( 9 )]
 anchor_right = 0.0
 margin_right = 252.0
-margin_bottom = 584.0
-size_flags_horizontal = 5
-size_flags_vertical = 3
+margin_bottom = 536.0
 
 [node name="Right" type="VBoxContainer" parent="HUD"]
 margin_left = 260.0
